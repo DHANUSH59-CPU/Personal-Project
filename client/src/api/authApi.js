@@ -8,6 +8,9 @@ export const authApi = apiSlice.injectEndpoints({
     login: builder.mutation({
       query: (data) => ({ url: '/auth/login', method: 'POST', body: data }),
     }),
+    googleLogin: builder.mutation({
+      query: (data) => ({ url: '/auth/google', method: 'POST', body: data }),
+    }),
     logout: builder.mutation({
       query: () => ({ url: '/auth/logout', method: 'POST' }),
     }),
@@ -18,4 +21,4 @@ export const authApi = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useRegisterMutation, useLoginMutation, useLogoutMutation, useGetMeQuery } = authApi;
+export const { useRegisterMutation, useLoginMutation, useGoogleLoginMutation, useLogoutMutation, useGetMeQuery } = authApi;

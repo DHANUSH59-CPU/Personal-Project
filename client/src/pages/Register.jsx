@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { useRegisterMutation } from '../api/authApi';
+import { GoogleLogin } from '@react-oauth/google';
+import { useRegisterMutation, useGoogleLoginMutation } from '../api/authApi';
 import { setCredentials } from '../store/slices/authSlice';
 import toast from 'react-hot-toast';
 
 const Register = () => {
   const [form, setForm] = useState({ name: '', email: '', password: '', phone: '' });
   const [register, { isLoading }] = useRegisterMutation();
+  const [googleLogin] = useGoogleLoginMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -20,6 +22,17 @@ const Register = () => {
       navigate('/');
     } catch (err) {
       toast.error(err?.data?.message || 'Registration failed');
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      const res = await googleLogin({ idToken: credentialResponse.credential }).unwrap();
+      dispatch(setCredentials({ user: res.data.user, accessToken: res.data.accessToken }));
+      toast.success('Account created successfully!');
+      navigate('/');
+    } catch (err) {
+      toast.error(err?.data?.message || 'Google registration failed');
     }
   };
 
@@ -74,6 +87,24 @@ const Register = () => {
             {isLoading ? 'Creating...' : 'Create Account'}
           </button>
         </form>
+
+        <div style={{ margin: 'var(--space-lg) 0', display: 'flex', alignItems: 'center', textAlign: 'center', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
+          <hr style={{ flex: 1, borderTop: '1px solid var(--color-border-light)' }} />
+          <span style={{ padding: '0 10px' }}>OR</span>
+          <hr style={{ flex: 1, borderTop: '1px solid var(--color-border-light)' }} />
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={() => toast.error('Google Sign-In was unsuccessful')}
+            shape="rectangular"
+            theme="outline"
+            size="large"
+            text="signup_with"
+            width="100%"
+          />
+        </div>
 
         <p style={{ textAlign: 'center', marginTop: 'var(--space-lg)', fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>
           Already have an account?{' '}

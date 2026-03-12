@@ -98,3 +98,50 @@ export const refreshAccessToken = async (incomingRefreshToken) => {
     throw new ApiError(401, 'Invalid or expired refresh token');
   }
 };
+
+/**
+ * Google Authentication.
+ */
+export const googleAuth = async (idToken) => {
+  const { OAuth2Client } = await import('google-auth-library');
+  const client = new OAuth2Client(env.GOOGLE_CLIENT_ID);
+  
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken,
+      audience: env.GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    const { email, name, sub: googleId } = payload;
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      // Create a new user if not exists
+      user = await User.create({
+        name,
+        email,
+        googleId,
+        // Using a random placeholder password since it's now optional/handled by pre-save
+        // but we made it optional in the schema so it's fine
+      });
+    } else if (!user.googleId) {
+      // Link Google account to existing email user
+      user.googleId = googleId;
+      await user.save({ validateBeforeSave: false });
+    }
+
+    const { accessToken, refreshToken } = generateTokens(user._id);
+    user.refreshToken = refreshToken;
+    await user.save({ validateBeforeSave: false });
+
+    const userObj = user.toObject();
+    delete userObj.password;
+    delete userObj.refreshToken;
+
+    return { user: userObj, accessToken, refreshToken };
+  } catch (error) {
+    console.error('Google Auth Error:', error);
+    throw new ApiError(401, 'Google sign-in failed');
+  }
+};

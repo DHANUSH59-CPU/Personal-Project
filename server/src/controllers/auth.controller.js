@@ -1,5 +1,6 @@
 import asyncHandler from '../utils/asyncHandler.js';
 import ApiResponse from '../utils/ApiResponse.js';
+import ApiError from '../utils/ApiError.js';
 import * as authService from '../services/auth.service.js';
 
 const COOKIE_OPTIONS = {
@@ -25,6 +26,18 @@ export const login = asyncHandler(async (req, res) => {
     .status(200)
     .cookie('refreshToken', refreshToken, COOKIE_OPTIONS)
     .json(new ApiResponse(200, { user, accessToken }, 'Login successful'));
+});
+
+export const googleAuth = asyncHandler(async (req, res) => {
+  const { idToken } = req.body;
+  if (!idToken) throw new ApiError(400, 'Google ID token is required');
+
+  const { user, accessToken, refreshToken } = await authService.googleAuth(idToken);
+
+  res
+    .status(200)
+    .cookie('refreshToken', refreshToken, COOKIE_OPTIONS)
+    .json(new ApiResponse(200, { user, accessToken }, 'Google login successful'));
 });
 
 export const logout = asyncHandler(async (req, res) => {
