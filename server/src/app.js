@@ -2,9 +2,14 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import env from './config/env.js';
 import routes from './routes/index.js';
 import errorHandler from './middlewares/error.middleware.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
@@ -43,13 +48,25 @@ app.use('/api/auth', authLimiter);
 
 app.use('/api', routes);
 
-// 404 handler
-app.use((_req, res) => {
-  res.status(404).json({ success: false, message: 'Route not found' });
-});
+// ─── Serve Frontend in Production ──────────────────────────
+
+if (env.NODE_ENV === 'production') {
+  const clientDist = path.join(__dirname, '../../client/dist');
+  app.use(express.static(clientDist));
+
+  // All non-API routes → index.html (SPA routing)
+  app.get('*', (_req, res) => {
+    res.sendFile(path.join(clientDist, 'index.html'));
+  });
+} else {
+  app.use((_req, res) => {
+    res.status(404).json({ success: false, message: 'Route not found' });
+  });
+}
 
 // ─── Error Handler ─────────────────────────────────────────
 
 app.use(errorHandler);
 
 export default app;
+
