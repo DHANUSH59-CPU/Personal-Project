@@ -4,10 +4,17 @@ import env from '../config/env.js';
 import Order from '../models/Order.js';
 import ApiError from '../utils/ApiError.js';
 
-const razorpay = new Razorpay({
-  key_id: env.RAZORPAY_KEY_ID,
-  key_secret: env.RAZORPAY_KEY_SECRET,
-});
+// Lazy init — only created when a payment is actually triggered
+const getRazorpay = () => {
+  if (!env.RAZORPAY_KEY_ID || !env.RAZORPAY_KEY_SECRET ||
+      env.RAZORPAY_KEY_ID === 'your_razorpay_key_id') {
+    throw new ApiError(503, 'Online payment is not configured. Please use Cash on Delivery.');
+  }
+  return new Razorpay({
+    key_id: env.RAZORPAY_KEY_ID,
+    key_secret: env.RAZORPAY_KEY_SECRET,
+  });
+};
 
 /**
  * Create a Razorpay order for payment.
@@ -16,7 +23,7 @@ export const createRazorpayOrder = async (orderId) => {
   const order = await Order.findById(orderId);
   if (!order) throw new ApiError(404, 'Order not found');
 
-  const razorpayOrder = await razorpay.orders.create({
+  const razorpayOrder = await getRazorpay().orders.create({
     amount: Math.round(order.totalAmount * 100), // Razorpay uses paise
     currency: 'INR',
     receipt: orderId.toString(),
