@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
-import { FiPackage, FiChevronRight, FiShoppingBag } from 'react-icons/fi';
-import { useGetUserOrdersQuery } from '../api/orderApi';
+import { FiPackage, FiChevronRight, FiShoppingBag, FiX } from 'react-icons/fi';
+import toast from 'react-hot-toast';
+import { useGetUserOrdersQuery, useCancelOrderMutation } from '../api/orderApi';
 import styles from '../styles/pages/Orders.module.css';
 
 const statusColors = {
@@ -12,9 +13,23 @@ const statusColors = {
   cancelled: '#E91E63',
 };
 
+const CANCELLABLE = ['processing', 'confirmed'];
+
 const Orders = () => {
   const { data, isLoading } = useGetUserOrdersQuery();
+  const [cancelOrder, { isLoading: cancelling }] = useCancelOrderMutation();
   const orders = data?.data?.orders || [];
+
+  const handleCancel = async (e, orderId) => {
+    e.preventDefault();
+    if (!window.confirm('Are you sure you want to cancel this order?')) return;
+    try {
+      await cancelOrder(orderId).unwrap();
+      toast.success('Order cancelled successfully');
+    } catch (err) {
+      toast.error(err?.data?.message || 'Failed to cancel order');
+    }
+  };
 
   if (isLoading) {
     return (
@@ -40,41 +55,53 @@ const Orders = () => {
       ) : (
         <div className={styles.ordersList}>
           {orders.map((order) => (
-            <Link key={order._id} to={`/orders/${order._id}`} className={styles.orderCard}>
-              <div className={styles.orderHeader}>
-                <div className={styles.orderIdBlock}>
-                  <FiPackage size={18} />
-                  <span className={styles.orderId}>#{order._id.slice(-8).toUpperCase()}</span>
-                </div>
-                <span
-                  className={styles.statusBadge}
-                  style={{ background: `${statusColors[order.orderStatus]}15`, color: statusColors[order.orderStatus] }}
-                >
-                  {order.orderStatus?.replace(/_/g, ' ')}
-                </span>
-              </div>
-
-              <div className={styles.orderMeta}>
-                <span>{new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-                <span>•</span>
-                <span>{order.items.length} {order.items.length === 1 ? 'item' : 'items'}</span>
-                <span>•</span>
-                <span className={styles.orderTotal}>₹{order.totalAmount.toLocaleString('en-IN')}</span>
-              </div>
-
-              <div className={styles.orderItems}>
-                {order.items.slice(0, 3).map((item, i) => (
-                  <div key={i} className={styles.thumbWrap}>
-                    <img src={item.image || '/placeholder.png'} alt={item.name} className={styles.thumb} />
+            <div key={order._id} className={styles.orderCardWrap}>
+              <Link to={`/orders/${order._id}`} className={styles.orderCard}>
+                <div className={styles.orderHeader}>
+                  <div className={styles.orderIdBlock}>
+                    <FiPackage size={18} />
+                    <span className={styles.orderId}>#{order._id.slice(-8).toUpperCase()}</span>
                   </div>
-                ))}
-                {order.items.length > 3 && (
-                  <div className={styles.moreItems}>+{order.items.length - 3}</div>
-                )}
-              </div>
+                  <span
+                    className={styles.statusBadge}
+                    style={{ background: `${statusColors[order.orderStatus]}15`, color: statusColors[order.orderStatus] }}
+                  >
+                    {order.orderStatus?.replace(/_/g, ' ')}
+                  </span>
+                </div>
 
-              <FiChevronRight className={styles.chevron} size={20} />
-            </Link>
+                <div className={styles.orderMeta}>
+                  <span>{new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                  <span>•</span>
+                  <span>{order.items.length} {order.items.length === 1 ? 'item' : 'items'}</span>
+                  <span>•</span>
+                  <span className={styles.orderTotal}>₹{order.totalAmount.toLocaleString('en-IN')}</span>
+                </div>
+
+                <div className={styles.orderItems}>
+                  {order.items.slice(0, 3).map((item, i) => (
+                    <div key={i} className={styles.thumbWrap}>
+                      <img src={item.image || '/placeholder.png'} alt={item.name} className={styles.thumb} />
+                    </div>
+                  ))}
+                  {order.items.length > 3 && (
+                    <div className={styles.moreItems}>+{order.items.length - 3}</div>
+                  )}
+                </div>
+
+                <FiChevronRight className={styles.chevron} size={20} />
+              </Link>
+
+              {CANCELLABLE.includes(order.orderStatus) && (
+                <button
+                  className={styles.cancelBtn}
+                  onClick={(e) => handleCancel(e, order._id)}
+                  disabled={cancelling}
+                >
+                  <FiX size={14} /> Cancel Order
+                </button>
+              )}
+            </div>
           ))}
         </div>
       )}

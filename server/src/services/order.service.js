@@ -181,3 +181,29 @@ export const getAllOrders = async (query) => {
   const pagination = getPagination(page, limit, totalDocs);
   return { orders, pagination };
 };
+
+/**
+ * Cancel an order (user) — only allowed for processing/confirmed orders.
+ */
+export const cancelOrder = async (orderId, userId) => {
+  const order = await Order.findOne({ _id: orderId, user: userId });
+  if (!order) throw new ApiError(404, 'Order not found');
+
+  const cancellableStatuses = ['processing', 'confirmed'];
+  if (!cancellableStatuses.includes(order.orderStatus)) {
+    throw new ApiError(400, `Order cannot be cancelled once it is "${order.orderStatus}"`);
+  }
+
+  order.orderStatus = 'cancelled';
+  order.cancelledAt = new Date();
+
+  // Restore stock
+  for (const item of order.items) {
+    await Product.findByIdAndUpdate(item.product, {
+      $inc: { stock: item.quantity },
+    });
+  }
+
+  await order.save();
+  return order;
+};

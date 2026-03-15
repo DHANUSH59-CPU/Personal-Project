@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createOrder, getUserOrders, getOrder, getAllOrders, updateOrderStatus, initiatePayment, verifyPayment } from '../controllers/order.controller.js';
+import { createOrder, getUserOrders, getOrder, getAllOrders, updateOrderStatus, cancelOrder, initiatePayment, verifyPayment } from '../controllers/order.controller.js';
 import { authenticate } from '../middlewares/auth.middleware.js';
 import { authorize } from '../middlewares/role.middleware.js';
 import validate from '../middlewares/validate.middleware.js';
@@ -12,6 +12,7 @@ router.use(authenticate); // All order routes need auth
 router.post('/', validate(createOrderSchema), createOrder);
 router.get('/', getUserOrders);
 router.get('/:id', getOrder);
+router.patch('/:id/cancel', cancelOrder);
 
 // Payment
 router.post('/:orderId/pay', initiatePayment);

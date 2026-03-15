@@ -30,6 +30,11 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, order, 'Order status updated'));
 });
 
+export const cancelOrder = asyncHandler(async (req, res) => {
+  const order = await orderService.cancelOrder(req.params.id, req.user._id);
+  res.status(200).json(new ApiResponse(200, order, 'Order cancelled successfully'));
+});
+
 // Payment
 export const initiatePayment = asyncHandler(async (req, res) => {
   const paymentData = await paymentService.createRazorpayOrder(req.params.orderId);

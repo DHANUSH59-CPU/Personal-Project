@@ -164,6 +164,39 @@
   color: var(--color-text-muted);
 }
 
+.orderCardWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.cancelBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: rgba(233, 30, 99, 0.07);
+  color: #c2185b;
+  border: 1px solid rgba(233, 30, 99, 0.2);
+  border-top: none;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  width: 100%;
+  justify-content: center;
+}
+
+.cancelBtn:hover {
+  background: rgba(233, 30, 99, 0.14);
+}
+
+.cancelBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 @media (max-width: 768px) {
   .orderCard {
     padding: var(--space-md);
