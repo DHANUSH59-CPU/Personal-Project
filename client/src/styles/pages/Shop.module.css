@@ -79,6 +79,28 @@
   position: sticky;
   top: calc(var(--nav-height) + var(--space-xl));
   align-self: start;
+  max-height: calc(100vh - var(--nav-height) - var(--space-2xl));
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-primary-100) transparent;
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--color-primary-100);
+  border-radius: 10px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-light);
 }
 
 .filterCard {
@@ -107,6 +129,36 @@
 
 .clearBtn:hover {
   text-decoration: underline;
+}
+
+.filterTitleActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.closeFilterBtn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-50);
+  color: var(--color-primary);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.closeFilterBtn:hover {
+  background: var(--color-primary);
+  color: white;
+}
+
+.sidebarBackdrop {
+  display: none;
 }
 
 .filterGroup {
@@ -265,17 +317,9 @@
     gap: var(--space-sm);
   }
 
-  .searchWrap {
-    width: 100%;
-  }
-
-  .searchInput {
-    width: 100%;
-  }
-
-  .sortSelect {
-    width: 100%;
-  }
+  .searchWrap { width: 100%; }
+  .searchInput { width: 100%; }
+  .sortSelect { width: 100%; }
 
   .mobileFilterBtn {
     display: flex;
@@ -283,24 +327,55 @@
     justify-content: center;
   }
 
+  /* Mobile sidebar — slide-in panel from left */
   .sidebar {
-    display: none;
     position: fixed;
-    inset: 0;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 300px;
+    max-height: 100vh;
     z-index: 1500;
-    background: rgba(0, 0, 0, 0.5);
-    padding: var(--space-xl);
-    padding-top: 80px;
+    background: var(--color-surface);
+    padding: var(--space-xl) var(--space-lg);
+    padding-top: calc(var(--nav-height) + var(--space-lg));
     overflow-y: auto;
+    overflow-x: hidden;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-primary-100) transparent;
+  }
+
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb {
+    background: var(--color-primary-100);
+    border-radius: 10px;
   }
 
   .sidebar.sidebarOpen {
+    transform: translateX(0);
+  }
+
+  .closeFilterBtn {
+    display: flex;
+  }
+
+  .sidebarBackdrop {
     display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1499;
   }
 
   .filterCard {
-    max-width: 320px;
-    margin: 0 auto;
+    max-width: 100%;
+    border: none;
+    padding: 0;
+    background: transparent;
   }
 
   .grid {

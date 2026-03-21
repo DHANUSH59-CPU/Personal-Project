@@ -109,13 +109,28 @@ const Shop = () => {
         </div>
 
         {/* Sidebar Filters */}
+        {mobileFiltersOpen && (
+          <div
+            className={styles.sidebarBackdrop}
+            onClick={() => setMobileFiltersOpen(false)}
+          />
+        )}
         <aside className={`${styles.sidebar} ${mobileFiltersOpen ? styles.sidebarOpen : ''}`}>
           <div className={styles.filterCard}>
             <div className={styles.filterTitle}>
               <span>Filters</span>
-              {hasActiveFilters && (
-                <button className={styles.clearBtn} onClick={clearFilters}>Clear All</button>
-              )}
+              <div className={styles.filterTitleActions}>
+                {hasActiveFilters && (
+                  <button className={styles.clearBtn} onClick={clearFilters}>Clear All</button>
+                )}
+                <button
+                  className={styles.closeFilterBtn}
+                  onClick={() => setMobileFiltersOpen(false)}
+                  aria-label="Close filters"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
 
             {/* Category Filter */}
