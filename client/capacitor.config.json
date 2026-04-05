@@ -1,0 +1,17 @@
+{
+  "appId": "com.dsenterprises.app",
+  "appName": "DS Enterprises",
+  "webDir": "dist",
+  "plugins": {
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#1a1a2e"
+    },
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#1a1a2e",
+      "showSpinner": true,
+      "spinnerColor": "#e91e8a"
+    }
+  }
+}

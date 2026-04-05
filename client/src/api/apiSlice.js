@@ -1,8 +1,15 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { clearCredentials, setCredentials } from '../store/slices/authSlice';
+import { Capacitor } from '@capacitor/core';
+
+// On web (AWS): use relative '/api' (same origin)
+// On mobile app: use the full AWS backend URL
+const API_BASE_URL = Capacitor.isNativePlatform()
+  ? 'https://www.dsenterprises4u.com/api'
+  : '/api';
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: '/api',
+  baseUrl: API_BASE_URL,
   credentials: 'include',
   prepareHeaders: (headers, { getState }) => {
     const token = getState().auth.accessToken;

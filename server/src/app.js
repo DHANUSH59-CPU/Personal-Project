@@ -15,9 +15,22 @@ const app = express();
 
 // ─── Global Middleware ─────────────────────────────────────
 
-// CORS
+// CORS — allow website + mobile app origins
+const allowedOrigins = [
+  env.CLIENT_URL,
+  'http://localhost',       // Capacitor Android
+  'https://localhost',      // Capacitor Android (https)
+  'capacitor://localhost',  // Capacitor fallback
+];
 app.use(cors({
-  origin: env.CLIENT_URL,
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, server-to-server)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
 }));
 

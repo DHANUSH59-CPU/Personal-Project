@@ -27,3 +27,6 @@ coverage/
 
 # Uploads (local)
 uploads/
+
+# Capacitor - Native Android project (built locally, not deployed to AWS)
+client/android/
