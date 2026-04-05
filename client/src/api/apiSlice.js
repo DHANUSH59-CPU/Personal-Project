@@ -1,10 +1,11 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { clearCredentials, setCredentials } from '../store/slices/authSlice';
-import { Capacitor } from '@capacitor/core';
 
 // On web (AWS): use relative '/api' (same origin)
 // On mobile app: use the full AWS backend URL
-const API_BASE_URL = Capacitor.isNativePlatform()
+// Capacitor injects itself onto window at runtime — no import needed
+const isNative = typeof window !== 'undefined' && window.Capacitor?.isNativePlatform?.();
+const API_BASE_URL = isNative
   ? 'https://www.dsenterprises4u.com/api'
   : '/api';
 
