@@ -25,8 +25,10 @@ npm-debug.log*
 # Coverage
 coverage/
 
-# Uploads (local)
+# Uploads (local server uploads)
 uploads/
+# Allow static product images in client public
+!client/public/uploads/
 
 # Capacitor - Native Android project (built locally, not deployed to AWS)
 client/android/
