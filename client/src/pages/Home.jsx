@@ -91,7 +91,7 @@ function Hero() {
       <div className={styles.heroImageWrap}>
         <div className={styles.heroImageGlow} />
         <img
-          src="/uploads/WhatsApp Image 2026-03-11 at 8.05.35 PM.jpeg"
+          src="/uploads/hero-product.jpeg"
           alt="NewFeel Ultra Thin – 40 XXL pads"
           className={styles.heroImage}
         />
