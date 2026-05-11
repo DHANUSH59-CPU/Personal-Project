@@ -58,62 +58,74 @@ const Profile = () => {
 
   if (!user) {
     return (
-      <section className={`container ${styles.profilePage}`}>
-        <div className={styles.loading}>Loading profile...</div>
+      <section className={styles.profilePage}>
+        <div className="spinner" />
       </section>
     );
   }
 
-  return (
-    <section className={`container ${styles.profilePage}`}>
-      <h1 className={styles.title}>My Profile</h1>
+  const initials = user.name?.charAt(0)?.toUpperCase() || 'U';
 
-      {/* Profile Info */}
+  return (
+    <section className={styles.profilePage}>
+      <h1 className={styles.pageTitle}>My Profile</h1>
+
+      {/* Avatar row */}
       <div className={styles.card}>
+        <div className={styles.avatarRow}>
+          <div className={styles.avatar}>{initials}</div>
+          <div>
+            <div className={styles.avatarName}>{user.name}</div>
+            <div className={styles.avatarEmail}>{user.email}</div>
+          </div>
+        </div>
+
         <h2 className={styles.cardTitle}>
-          <FiUser size={18} /> Personal Information
+          <FiUser size={15} /> Personal Information
         </h2>
         <div className={styles.formGrid}>
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Name</label>
-            <input
-              className={styles.input}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Your name"
-            />
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Name</label>
+              <input
+                className={styles.input}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Your name"
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Phone</label>
+              <input
+                className={styles.input}
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="Phone number"
+                maxLength={10}
+              />
+            </div>
           </div>
           <div className={styles.formGroup}>
-            <label className={styles.label}>Phone</label>
-            <input
-              className={styles.input}
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="Phone number"
-              maxLength={10}
-            />
-          </div>
-          <div className={`${styles.formGroup} ${styles.fullWidth}`}>
             <label className={styles.label}>Email</label>
             <input
-              className={`${styles.input} ${styles.inputDisabled}`}
+              className={styles.input}
               value={user.email}
               disabled
             />
           </div>
         </div>
         <button className={styles.saveBtn} onClick={handleProfileSave} disabled={updating}>
-          <FiSave size={16} /> {updating ? 'Saving...' : 'Save Changes'}
+          <FiSave size={14} /> {updating ? 'Saving...' : 'Save Changes'}
         </button>
       </div>
 
       {/* Change Password */}
       <div className={styles.card}>
         <h2 className={styles.cardTitle}>
-          <FiLock size={18} /> Change Password
+          <FiLock size={15} /> Change Password
         </h2>
         <div className={styles.formGrid}>
-          <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+          <div className={styles.formGroup}>
             <label className={styles.label}>Current Password</label>
             <input
               className={styles.input}
@@ -123,29 +135,31 @@ const Profile = () => {
               placeholder="Enter current password"
             />
           </div>
-          <div className={styles.formGroup}>
-            <label className={styles.label}>New Password</label>
-            <input
-              className={styles.input}
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Min 6 characters"
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Confirm Password</label>
-            <input
-              className={styles.input}
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Repeat new password"
-            />
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>New Password</label>
+              <input
+                className={styles.input}
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Min 6 characters"
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Confirm Password</label>
+              <input
+                className={styles.input}
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Repeat new password"
+              />
+            </div>
           </div>
         </div>
         <button className={styles.saveBtn} onClick={handlePasswordChange} disabled={changingPw}>
-          <FiLock size={16} /> {changingPw ? 'Changing...' : 'Change Password'}
+          <FiLock size={14} /> {changingPw ? 'Changing...' : 'Change Password'}
         </button>
       </div>
     </section>

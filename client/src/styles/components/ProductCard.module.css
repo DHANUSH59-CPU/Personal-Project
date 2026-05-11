@@ -1,84 +1,77 @@
 .card {
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border-light);
+  display: block;
+  text-decoration: none;
+  background: #fff;
+  border: 1px solid #EEE5E9;
+  border-radius: 14px;
   overflow: hidden;
-  transition: transform var(--transition-base), box-shadow var(--transition-base);
-  display: flex;
-  flex-direction: column;
+  transition: box-shadow 0.25s, transform 0.25s;
 }
 
 .card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 8px 32px rgba(196,0,90,0.1);
+  transform: translateY(-2px);
 }
 
 .imageWrap {
   position: relative;
-  width: 100%;
-  aspect-ratio: 1;
+  aspect-ratio: 1/1;
   overflow: hidden;
-  background: var(--color-bg);
+  background: #FDF8F9;
 }
 
 .imageWrap img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform var(--transition-slow);
+  transition: transform 0.4s;
 }
 
-.card:hover .imageWrap img {
-  transform: scale(1.05);
-}
+.card:hover .imageWrap img { transform: scale(1.04); }
 
 .discountBadge {
   position: absolute;
   top: 10px;
   left: 10px;
-  background: var(--color-primary);
-  color: white;
-  padding: 3px 10px;
-  border-radius: 12px;
-  font-size: 0.72rem;
+  background: #C4005A;
+  color: #fff;
+  font-size: 9px;
   font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 4px 8px;
+  border-radius: 3px;
 }
 
 .info {
-  padding: var(--space-md);
-  display: flex;
-  flex-direction: column;
-  flex: 1;
+  padding: 14px 16px 16px;
 }
 
 .category {
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--color-primary);
+  font-size: 9px;
   font-weight: 600;
-  margin-bottom: 4px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #C0AAAF;
+  display: block;
+  margin-bottom: 5px;
 }
 
 .name {
-  font-family: var(--font-heading);
-  font-size: 0.95rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 17px;
   font-weight: 600;
-  color: var(--color-text);
+  color: #1C1014;
+  line-height: 1.2;
   margin-bottom: 6px;
-  line-height: 1.3;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  letter-spacing: -0.01em;
 }
 
 .meta {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.75rem;
-  color: var(--color-text-muted);
+  font-size: 11px;
+  color: #9A8088;
   margin-bottom: 8px;
 }
 
@@ -86,44 +79,44 @@
   width: 3px;
   height: 3px;
   border-radius: 50%;
-  background: var(--color-text-muted);
+  background: #C0AAAF;
+  flex-shrink: 0;
 }
 
 .rating {
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 0.8rem;
-  color: var(--color-text-secondary);
+  font-size: 12px;
+  color: #5A4850;
   margin-bottom: 10px;
 }
 
-.star {
-  color: #FFC107;
-}
+.star { color: #C4005A; fill: #C4005A; }
 
 .priceRow {
   display: flex;
   align-items: baseline;
   gap: 8px;
-  margin-top: auto;
 }
 
 .price {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--color-text);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #C4005A;
 }
 
 .mrp {
-  font-size: 0.85rem;
-  color: var(--color-text-muted);
+  font-size: 12px;
+  color: #C0AAAF;
   text-decoration: line-through;
 }
 
 .outOfStock {
-  font-size: 0.8rem;
-  color: var(--color-error);
+  font-size: 11px;
   font-weight: 600;
-  margin-top: auto;
+  color: #C0AAAF;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }

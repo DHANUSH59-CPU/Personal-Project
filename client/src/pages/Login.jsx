@@ -5,6 +5,7 @@ import { GoogleLogin } from '@react-oauth/google';
 import { useLoginMutation, useGoogleLoginMutation } from '../api/authApi';
 import { setCredentials } from '../store/slices/authSlice';
 import toast from 'react-hot-toast';
+import styles from '../styles/pages/Auth.module.css';
 
 const Login = () => {
   const [form, setForm] = useState({ email: '', password: '' });
@@ -37,56 +38,60 @@ const Login = () => {
   };
 
   return (
-    <section className="container" style={{
-      display: 'flex', justifyContent: 'center', alignItems: 'center',
-      minHeight: 'calc(100vh - var(--nav-height) - 200px)', padding: 'var(--space-2xl) 0',
-    }}>
-      <div style={{
-        width: '100%', maxWidth: 420, background: 'var(--color-surface)',
-        borderRadius: 'var(--radius-lg)', padding: 'var(--space-2xl)',
-        boxShadow: 'var(--shadow-lg)', border: '1px solid var(--color-border-light)',
-      }}>
-        <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.8rem', marginBottom: 'var(--space-xs)', textAlign: 'center' }}>
-          Welcome Back
-        </h1>
-        <p style={{ color: 'var(--color-text-secondary)', textAlign: 'center', marginBottom: 'var(--space-xl)', fontSize: '0.9rem' }}>
-          Sign in to your PadCare account
-        </p>
+    <section className={styles.authPage}>
+      <div className={styles.authCard}>
+        {/* Header */}
+        <div className={styles.authHeader}>
+          <div className={styles.authLogo}>NewFeel</div>
+          <h1 className={styles.authTitle}>Welcome Back</h1>
+          <p className={styles.authSub}>Sign in to your account</p>
+        </div>
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-          <div>
-            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 500, marginBottom: 4, color: 'var(--color-text-secondary)' }}>Email</label>
+        {/* Form */}
+        <form onSubmit={handleSubmit} className={styles.authForm}>
+          <div className="form-group">
+            <label className="form-label">Email</label>
             <input
-              id="login-email" type="email" required value={form.email}
+              id="login-email"
+              className="form-input"
+              type="email"
+              required
+              value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
-              style={{ width: '100%', padding: '12px 14px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', fontSize: '0.95rem', transition: 'border var(--transition-fast)' }}
               placeholder="you@email.com"
             />
           </div>
-          <div>
-            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 500, marginBottom: 4, color: 'var(--color-text-secondary)' }}>Password</label>
+          <div className="form-group">
+            <label className="form-label">Password</label>
             <input
-              id="login-password" type="password" required value={form.password}
+              id="login-password"
+              className="form-input"
+              type="password"
+              required
+              value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
-              style={{ width: '100%', padding: '12px 14px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', fontSize: '0.95rem' }}
               placeholder="••••••"
             />
           </div>
           <button
-            id="login-submit" type="submit" disabled={isLoading}
-            style={{ padding: '14px', background: 'var(--gradient-primary)', color: 'white', borderRadius: 'var(--radius-md)', fontWeight: 600, fontSize: '1rem', marginTop: 'var(--space-sm)', cursor: 'pointer', boxShadow: 'var(--shadow-primary)' }}
+            id="login-submit"
+            type="submit"
+            disabled={isLoading}
+            className={styles.authSubmit}
           >
-            {isLoading ? 'Signing in...' : 'Sign In'}
+            {isLoading ? 'Signing in…' : 'Sign In'}
           </button>
         </form>
 
-        <div style={{ margin: 'var(--space-lg) 0', display: 'flex', alignItems: 'center', textAlign: 'center', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
-          <hr style={{ flex: 1, borderTop: '1px solid var(--color-border-light)' }} />
-          <span style={{ padding: '0 10px' }}>OR</span>
-          <hr style={{ flex: 1, borderTop: '1px solid var(--color-border-light)' }} />
+        {/* Divider */}
+        <div className={styles.divider}>
+          <span className={styles.dividerLine} />
+          <span className={styles.dividerText}>or</span>
+          <span className={styles.dividerLine} />
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
+        {/* Google */}
+        <div className={styles.googleWrap}>
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
             onError={() => toast.error('Google Sign-In was unsuccessful')}
@@ -98,9 +103,9 @@ const Login = () => {
           />
         </div>
 
-        <p style={{ textAlign: 'center', marginTop: 'var(--space-lg)', fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>
+        <p className={styles.authSwitch}>
           Don't have an account?{' '}
-          <Link to="/register" style={{ color: 'var(--color-primary)', fontWeight: 600 }}>Register</Link>
+          <Link to="/register" className={styles.authSwitchLink}>Register</Link>
         </p>
       </div>
     </section>

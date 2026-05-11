@@ -30,18 +30,18 @@ const OrderConfirmation = () => {
 
   if (isLoading) {
     return (
-      <section className={`container ${styles.page}`}>
-        <div className={styles.loading}>Loading order details...</div>
+      <section className={styles.confirmPage}>
+        <div className="spinner" />
       </section>
     );
   }
 
   if (error || !order) {
     return (
-      <section className={`container ${styles.page}`}>
+      <section className={styles.confirmPage}>
         <div className={styles.errorState}>
-          <h2>Order not found</h2>
-          <Link to="/shop">Back to Shop</Link>
+          <p>Order not found.</p>
+          <a href="/shop">Back to Shop</a>
         </div>
       </section>
     );
@@ -50,67 +50,58 @@ const OrderConfirmation = () => {
   const addr = order.shippingAddress;
 
   return (
-    <section className={`container ${styles.page}`}>
+    <section className={styles.confirmPage}>
       {/* ─── Success Banner ─────────────── */}
       <div className={styles.successBanner}>
-        <div className={styles.successIcon}>✅</div>
-        <h1 className={styles.successTitle}>Order Placed Successfully!</h1>
-        <p className={styles.orderId}>
+        <span className={styles.successIcon}>🎉</span>
+        <h1 className={styles.successTitle}>Order Placed!</h1>
+        <p className={styles.orderIdRow}>
           Order ID: <span className={styles.orderIdCode}>#{order._id.slice(-8).toUpperCase()}</span>
         </p>
       </div>
 
-      {/* ─── Details Grid ───────────────── */}
-      <div className={styles.detailsGrid}>
-        {/* Shipping Address */}
-        <div className={styles.card}>
-          <h3 className={styles.cardTitle}>
-            <FiMapPin size={16} /> Shipping Address
-          </h3>
-          <div className={styles.addressText}>
-            <strong>{addr.fullName}</strong>
-            <br />
-            {addr.line1}
-            {addr.line2 && <>, {addr.line2}</>}
-            <br />
-            {addr.city}, {addr.state} — {addr.pincode}
-            <br />
-            📞 {addr.phone}
-          </div>
+      {/* ─── Shipping Address ─────────────── */}
+      <div className={styles.card}>
+        <h3 className={styles.cardTitle}>
+          <FiMapPin size={14} /> Shipping Address
+        </h3>
+        <div className={styles.addressText}>
+          <strong>{addr.fullName}</strong><br />
+          {addr.line1}{addr.line2 && `, ${addr.line2}`}<br />
+          {addr.city}, {addr.state} — {addr.pincode}<br />
+          {addr.phone}
         </div>
+      </div>
 
-        {/* Order Status */}
-        <div className={styles.card}>
-          <h3 className={styles.cardTitle}>
-            <FiCreditCard size={16} /> Order Status
-          </h3>
-          <div className={styles.statusRow}>
-            <div className={styles.statusItem}>
-              <span className={styles.statusLabel}>Payment</span>
-              {getPaymentBadge(order.paymentStatus)}
-            </div>
-            <div className={styles.statusItem}>
-              <span className={styles.statusLabel}>Order</span>
-              {getOrderBadge(order.orderStatus)}
-            </div>
-            <div className={styles.statusItem}>
-              <span className={styles.statusLabel}>Method</span>
-              <span style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.85rem' }}>
-                {order.paymentMethod}
-              </span>
-            </div>
+      {/* ─── Order Status ─────────────────── */}
+      <div className={styles.card}>
+        <h3 className={styles.cardTitle}>
+          <FiCreditCard size={14} /> Order Status
+        </h3>
+        <div className={styles.statusRow}>
+          <div className={styles.statusItem}>
+            <span className={styles.statusLabel}>Payment</span>
+            {getPaymentBadge(order.paymentStatus)}
+          </div>
+          <div className={styles.statusItem}>
+            <span className={styles.statusLabel}>Order</span>
+            {getOrderBadge(order.orderStatus)}
+          </div>
+          <div className={styles.statusItem}>
+            <span className={styles.statusLabel}>Method</span>
+            <span className={styles.methodText}>{order.paymentMethod}</span>
           </div>
         </div>
       </div>
 
-      {/* ─── Order Items ────────────────── */}
-      <div className={styles.itemsCard}>
+      {/* ─── Order Items ──────────────────── */}
+      <div className={styles.card}>
         <h3 className={styles.cardTitle}>Order Items</h3>
         <div className={styles.itemsList}>
           {order.items.map((item, i) => (
             <div key={i} className={styles.orderItem}>
               <div className={styles.itemImg}>
-                <img src={item.image || '/placeholder.png'} alt={item.name} />
+                <img src={item.image || '/favicon.svg'} alt={item.name} />
               </div>
               <div className={styles.itemInfo}>
                 <div className={styles.itemName}>{item.name}</div>
@@ -131,16 +122,16 @@ const OrderConfirmation = () => {
           {order.discount > 0 && (
             <div className={styles.priceRow}>
               <span>Discount</span>
-              <span style={{ color: 'var(--color-success)', fontWeight: 600 }}>
-                −₹{order.discount.toLocaleString('en-IN')}
-              </span>
+              <span className={styles.savingsValue}>−₹{order.discount.toLocaleString('en-IN')}</span>
             </div>
           )}
           <div className={styles.priceRow}>
             <span>Shipping</span>
-            <span className={styles.priceValue}>
-              {order.shippingCost === 0 ? 'FREE' : `₹${order.shippingCost}`}
-            </span>
+            {order.shippingCost === 0 ? (
+              <span className={styles.freeShipping}>FREE</span>
+            ) : (
+              <span className={styles.priceValue}>₹{order.shippingCost}</span>
+            )}
           </div>
           <div className={styles.totalRow}>
             <span className={styles.totalLabel}>Total</span>
@@ -149,13 +140,13 @@ const OrderConfirmation = () => {
         </div>
       </div>
 
-      {/* ─── Actions ────────────────────── */}
+      {/* ─── Actions ──────────────────────── */}
       <div className={styles.actions}>
         <Link to="/shop" className={styles.shopBtn}>
-          <FiShoppingBag size={18} /> Continue Shopping
+          <FiShoppingBag size={16} /> Continue Shopping
         </Link>
         <Link to="/orders" className={styles.ordersBtn}>
-          <FiList size={18} /> View All Orders
+          <FiList size={16} /> View All Orders
         </Link>
       </div>
     </section>

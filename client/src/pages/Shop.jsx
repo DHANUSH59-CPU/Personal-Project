@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { FiSearch, FiFilter } from 'react-icons/fi';
+import { FiSearch, FiFilter, FiX } from 'react-icons/fi';
 import { useGetProductsQuery } from '../api/productApi';
 import { useGetCategoriesQuery } from '../api/categoryApi';
 import ProductCard from '../components/product/ProductCard';
@@ -11,33 +11,23 @@ const Shop = () => {
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState('newest');
   const [page, setPage] = useState(1);
-  const [filters, setFilters] = useState({
-    category: '',
-    size: '',
-    absorbency: '',
-    minPrice: '',
-    maxPrice: '',
-  });
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [filters, setFilters] = useState({ category: '', size: '', absorbency: '', minPrice: '', maxPrice: '' });
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const debouncedSearch = useDebounce(search, 400);
 
-  // Build query params
   const queryParams = useMemo(() => {
-    const params = { page, limit: 12 };
+    const params = { page, limit: 12, sort };
     if (debouncedSearch) params.search = debouncedSearch;
     if (filters.category) params.category = filters.category;
     if (filters.size) params.size = filters.size;
     if (filters.absorbency) params.absorbency = filters.absorbency;
     if (filters.minPrice) params.minPrice = filters.minPrice;
     if (filters.maxPrice) params.maxPrice = filters.maxPrice;
-
-    // Pass sort key directly — backend helper accepts these
-    params.sort = sort;
     return params;
   }, [page, debouncedSearch, filters, sort]);
 
-  const { data, isLoading, isFetching } = useGetProductsQuery(queryParams);
+  const { data, isLoading } = useGetProductsQuery(queryParams);
   const { data: categoriesData } = useGetCategoriesQuery();
 
   const products = data?.data?.products || [];
@@ -45,10 +35,7 @@ const Shop = () => {
   const categories = categoriesData?.data || [];
 
   const handleFilterChange = (key, value) => {
-    setFilters((prev) => ({
-      ...prev,
-      [key]: prev[key] === value ? '' : value,
-    }));
+    setFilters((prev) => ({ ...prev, [key]: prev[key] === value ? '' : value }));
     setPage(1);
   };
 
@@ -63,127 +50,117 @@ const Shop = () => {
 
   return (
     <section className={styles.shopPage}>
-      <div className={`container ${styles.shopInner}`}>
-        {/* Top Bar */}
-        <div className={styles.topBar}>
-          <div>
-            <h1 className={styles.title}>Shop</h1>
-            {pagination.totalDocs > 0 && (
-              <span className={styles.resultCount}>
-                {pagination.totalDocs} product{pagination.totalDocs !== 1 ? 's' : ''} found
-              </span>
-            )}
+      {/* ── TOP BAR ── */}
+      <div className={styles.topBar}>
+        <h1 className={styles.pageTitle}>Our Products</h1>
+        <div className={styles.topControls}>
+          <div className={styles.searchWrap}>
+            <FiSearch size={15} className={styles.searchIcon} />
+            <input
+              id="shop-search"
+              className={styles.searchInput}
+              type="text"
+              placeholder="Search…"
+              value={search}
+              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            />
           </div>
 
-          <div className={styles.topActions}>
-            <button
-              className={styles.mobileFilterBtn}
-              onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
-            >
-              <FiFilter size={16} /> Filters
-            </button>
+          <button
+            className={`${styles.filterToggleBtn} ${filtersOpen ? styles.filterToggleBtnActive : ''}`}
+            onClick={() => setFiltersOpen(!filtersOpen)}
+          >
+            <FiFilter size={14} />
+            {hasActiveFilters ? 'Filters •' : 'Filter'}
+          </button>
 
-            <div className={styles.searchWrap}>
-              <FiSearch size={16} className={styles.searchIcon} />
-              <input
-                id="shop-search"
-                className={styles.searchInput}
-                type="text"
-                placeholder="Search products..."
-                value={search}
-                onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-              />
-            </div>
-
-            <select
-              id="shop-sort"
-              className={styles.sortSelect}
-              value={sort}
-              onChange={(e) => { setSort(e.target.value); setPage(1); }}
-            >
-              {SORT_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-          </div>
+          <select
+            id="shop-sort"
+            className={styles.sortSelect}
+            value={sort}
+            onChange={(e) => { setSort(e.target.value); setPage(1); }}
+          >
+            {SORT_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
         </div>
-
-        {/* Sidebar Filters */}
-        {mobileFiltersOpen && (
-          <div
-            className={styles.sidebarBackdrop}
-            onClick={() => setMobileFiltersOpen(false)}
-          />
+        {pagination.totalDocs > 0 && (
+          <span className={styles.resultCount}>
+            {pagination.totalDocs} product{pagination.totalDocs !== 1 ? 's' : ''} found
+          </span>
         )}
-        <aside className={`${styles.sidebar} ${mobileFiltersOpen ? styles.sidebarOpen : ''}`}>
-          <div className={styles.filterCard}>
-            <div className={styles.filterTitle}>
-              <span>Filters</span>
-              <div className={styles.filterTitleActions}>
+      </div>
+
+      {/* ── FILTER PANEL ── */}
+      {filtersOpen && (
+        <div className={styles.filterPanel}>
+          <div className={styles.filterPanelInner}>
+            <div className={styles.filterPanelHeader}>
+              <span className={styles.filterPanelTitle}>Filters</span>
+              <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
                 {hasActiveFilters && (
                   <button className={styles.clearBtn} onClick={clearFilters}>Clear All</button>
                 )}
-                <button
-                  className={styles.closeFilterBtn}
-                  onClick={() => setMobileFiltersOpen(false)}
-                  aria-label="Close filters"
-                >
-                  ✕
+                <button onClick={() => setFiltersOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9A8088' }}>
+                  <FiX size={18} />
                 </button>
               </div>
             </div>
 
-            {/* Category Filter */}
+            {/* Category */}
+            {categories.length > 0 && (
+              <div className={styles.filterGroup}>
+                <div className={styles.filterGroupTitle}>Category</div>
+                <div className={styles.filterChips}>
+                  {categories.map((cat) => (
+                    <button
+                      key={cat._id}
+                      className={`${styles.filterChip} ${filters.category === cat._id ? styles.filterChipActive : ''}`}
+                      onClick={() => handleFilterChange('category', cat._id)}
+                    >
+                      {cat.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Size */}
             <div className={styles.filterGroup}>
-              <h4>Category</h4>
-              {categories.map((cat) => (
-                <label key={cat._id} className={styles.filterOption}>
-                  <input
-                    type="radio"
-                    name="category"
-                    checked={filters.category === cat._id}
-                    onChange={() => handleFilterChange('category', cat._id)}
-                  />
-                  {cat.name}
-                </label>
-              ))}
+              <div className={styles.filterGroupTitle}>Size</div>
+              <div className={styles.filterChips}>
+                {PRODUCT_SIZES.map((size) => (
+                  <button
+                    key={size}
+                    className={`${styles.filterChip} ${filters.size === size ? styles.filterChipActive : ''}`}
+                    onClick={() => handleFilterChange('size', size)}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {/* Size Filter */}
+            {/* Absorbency */}
             <div className={styles.filterGroup}>
-              <h4>Size</h4>
-              {PRODUCT_SIZES.map((size) => (
-                <label key={size} className={styles.filterOption}>
-                  <input
-                    type="radio"
-                    name="size"
-                    checked={filters.size === size}
-                    onChange={() => handleFilterChange('size', size)}
-                  />
-                  {size}
-                </label>
-              ))}
+              <div className={styles.filterGroupTitle}>Absorbency</div>
+              <div className={styles.filterChips}>
+                {ABSORBENCY_LEVELS.map((level) => (
+                  <button
+                    key={level}
+                    className={`${styles.filterChip} ${filters.absorbency === level ? styles.filterChipActive : ''}`}
+                    onClick={() => handleFilterChange('absorbency', level)}
+                  >
+                    {level}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {/* Absorbency Filter */}
+            {/* Price */}
             <div className={styles.filterGroup}>
-              <h4>Absorbency</h4>
-              {ABSORBENCY_LEVELS.map((level) => (
-                <label key={level} className={styles.filterOption}>
-                  <input
-                    type="radio"
-                    name="absorbency"
-                    checked={filters.absorbency === level}
-                    onChange={() => handleFilterChange('absorbency', level)}
-                  />
-                  {level}
-                </label>
-              ))}
-            </div>
-
-            {/* Price Range */}
-            <div className={styles.filterGroup}>
-              <h4>Price Range (₹)</h4>
+              <div className={styles.filterGroupTitle}>Price Range (₹)</div>
               <div className={styles.priceInputs}>
                 <input
                   className={styles.priceInput}
@@ -203,38 +180,43 @@ const Shop = () => {
               </div>
             </div>
           </div>
-        </aside>
-
-        {/* Product Grid */}
-        <div className={styles.grid}>
-          {isLoading ? (
-            <div className={styles.loading}>Loading products...</div>
-          ) : products.length === 0 ? (
-            <div className={styles.empty}>
-              <div className={styles.emptyIcon}>🔍</div>
-              <p>No products found. Try adjusting your filters.</p>
-            </div>
-          ) : (
-            products.map((product) => (
-              <ProductCard key={product._id} product={product} />
-            ))
-          )}
-
-          {/* Pagination */}
-          {pagination.totalPages > 1 && (
-            <div className={styles.pagination}>
-              {Array.from({ length: pagination.totalPages }, (_, i) => (
-                <button
-                  key={i + 1}
-                  className={`${styles.pageBtn} ${page === i + 1 ? styles.pageBtnActive : ''}`}
-                  onClick={() => setPage(i + 1)}
-                >
-                  {i + 1}
-                </button>
-              ))}
-            </div>
-          )}
         </div>
+      )}
+
+      {/* ── PRODUCT GRID ── */}
+      <div className={styles.grid}>
+        {isLoading ? (
+          <div className={styles.loadingWrap}>
+            <div className="spinner" />
+          </div>
+        ) : products.length === 0 ? (
+          <div className={styles.empty}>
+            <div className={styles.emptyIcon}>
+              <FiSearch size={24} />
+            </div>
+            <p className={styles.emptyText}>No products found</p>
+            <p className={styles.emptySub}>Try adjusting your search or filters</p>
+          </div>
+        ) : (
+          products.map((product) => (
+            <ProductCard key={product._id} product={product} />
+          ))
+        )}
+
+        {/* Pagination */}
+        {pagination.totalPages > 1 && (
+          <div className={styles.pagination}>
+            {Array.from({ length: pagination.totalPages }, (_, i) => (
+              <button
+                key={i + 1}
+                className={`${styles.pageBtn} ${page === i + 1 ? styles.pageBtnActive : ''}`}
+                onClick={() => setPage(i + 1)}
+              >
+                {i + 1}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

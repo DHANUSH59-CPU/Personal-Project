@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiMapPin, FiCreditCard, FiShield, FiTag, FiArrowLeft } from 'react-icons/fi';
+import { FiMapPin, FiCreditCard, FiShield, FiTag, FiArrowLeft, FiShoppingBag } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import { useGetCartQuery } from '../api/cartApi';
 import { useCreateOrderMutation, useInitiatePaymentMutation, useVerifyPaymentMutation } from '../api/orderApi';
@@ -119,7 +119,7 @@ const Checkout = () => {
             name: address.fullName,
             contact: address.phone,
           },
-          theme: { color: '#E91E63' },
+          theme: { color: '#C4005A' },
         };
 
         const rzp = new window.Razorpay(options);
@@ -166,20 +166,21 @@ const Checkout = () => {
     }
   };
 
-  // ── Loading / Empty ───────────────────────
+  // ── Loading ───────────────────────────────
   if (cartLoading) {
     return (
-      <section className={`container ${styles.checkoutPage}`}>
-        <div className={styles.loading}>Loading checkout...</div>
+      <section className={styles.checkoutPage}>
+        <div className="spinner" />
       </section>
     );
   }
 
+  // ── Empty cart ────────────────────────────
   if (items.length === 0) {
     return (
-      <section className={`container ${styles.checkoutPage}`}>
+      <section className={styles.checkoutPage}>
         <div className={styles.emptyState}>
-          <div className={styles.emptyIcon}>🛒</div>
+          <div className={styles.emptyIcon}><FiShoppingBag size={28} /></div>
           <h2 className={styles.emptyTitle}>Your cart is empty</h2>
           <Link to="/shop" className={styles.emptyBtn}>
             <FiArrowLeft size={16} /> Continue Shopping
@@ -192,222 +193,215 @@ const Checkout = () => {
   const isSubmitting = creatingOrder || processing;
 
   return (
-    <section className={`container ${styles.checkoutPage}`}>
-      <h1 className={styles.title}>Checkout</h1>
+    <section className={styles.checkoutPage}>
+      <h1 className={styles.pageTitle}>Checkout</h1>
 
-      <div className={styles.layout}>
-        {/* ─── Left: Form Panel ─────────────── */}
-        <div className={styles.formPanel}>
-          {/* Shipping Address */}
-          <div className={styles.card}>
-            <h2 className={styles.cardTitle}>
-              <FiMapPin size={18} /> Shipping Address
-            </h2>
-            <div className={styles.formGrid}>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Full Name *</label>
-                <input
-                  className={styles.input}
-                  name="fullName"
-                  value={address.fullName}
-                  onChange={handleChange}
-                  placeholder="John Doe"
-                />
-                {errors.fullName && <span className={styles.error}>{errors.fullName}</span>}
-              </div>
-
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Phone *</label>
-                <input
-                  className={styles.input}
-                  name="phone"
-                  value={address.phone}
-                  onChange={handleChange}
-                  placeholder="9876543210"
-                  maxLength={10}
-                />
-                {errors.phone && <span className={styles.error}>{errors.phone}</span>}
-              </div>
-
-              <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                <label className={styles.label}>Address Line 1 *</label>
-                <input
-                  className={styles.input}
-                  name="line1"
-                  value={address.line1}
-                  onChange={handleChange}
-                  placeholder="House / Flat / Building"
-                />
-                {errors.line1 && <span className={styles.error}>{errors.line1}</span>}
-              </div>
-
-              <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                <label className={styles.label}>Address Line 2</label>
-                <input
-                  className={styles.input}
-                  name="line2"
-                  value={address.line2}
-                  onChange={handleChange}
-                  placeholder="Street, Area, Landmark"
-                />
-              </div>
-
-              <div className={styles.formGroup}>
-                <label className={styles.label}>City *</label>
-                <input
-                  className={styles.input}
-                  name="city"
-                  value={address.city}
-                  onChange={handleChange}
-                  placeholder="City"
-                />
-                {errors.city && <span className={styles.error}>{errors.city}</span>}
-              </div>
-
-              <div className={styles.formGroup}>
-                <label className={styles.label}>State *</label>
-                <input
-                  className={styles.input}
-                  name="state"
-                  value={address.state}
-                  onChange={handleChange}
-                  placeholder="State"
-                />
-                {errors.state && <span className={styles.error}>{errors.state}</span>}
-              </div>
-
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Pincode *</label>
-                <input
-                  className={styles.input}
-                  name="pincode"
-                  value={address.pincode}
-                  onChange={handleChange}
-                  placeholder="560001"
-                  maxLength={6}
-                />
-                {errors.pincode && <span className={styles.error}>{errors.pincode}</span>}
-              </div>
-            </div>
-          </div>
-
-          {/* Payment Method */}
-          <div className={styles.card}>
-            <h2 className={styles.cardTitle}>
-              <FiCreditCard size={18} /> Payment Method
-            </h2>
-            <div className={styles.paymentOptions}>
-              <div
-                className={`${styles.paymentOption} ${paymentMethod === 'cod' ? styles.paymentOptionActive : ''}`}
-                onClick={() => setPaymentMethod('cod')}
-              >
-                <div className={`${styles.paymentRadio} ${paymentMethod === 'cod' ? styles.paymentRadioActive : ''}`} />
-                <div>
-                  <div className={styles.paymentLabel}>💵 Cash on Delivery</div>
-                  <div className={styles.paymentDesc}>Pay when your order arrives</div>
-                </div>
-              </div>
-
-              <div
-                className={`${styles.paymentOption} ${paymentMethod === 'razorpay' ? styles.paymentOptionActive : ''}`}
-                onClick={() => setPaymentMethod('razorpay')}
-              >
-                <div className={`${styles.paymentRadio} ${paymentMethod === 'razorpay' ? styles.paymentRadioActive : ''}`} />
-                <div>
-                  <div className={styles.paymentLabel}>💳 Pay Online (Razorpay)</div>
-                  <div className={styles.paymentDesc}>Credit/Debit Card, UPI, Netbanking</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Coupon */}
-          <div className={styles.card}>
-            <h2 className={styles.cardTitle}>
-              <FiTag size={18} /> Have a Coupon?
-            </h2>
-            <div className={styles.couponRow}>
+      {/* ─── Shipping Address ─────────────── */}
+      <div className={styles.card}>
+        <h2 className={styles.cardTitle}>
+          <FiMapPin size={16} /> Shipping Address
+        </h2>
+        <div className={styles.formGrid}>
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Full Name *</label>
               <input
-                className={styles.couponInput}
-                value={couponCode}
-                onChange={(e) => setCouponCode(e.target.value)}
-                placeholder="Enter coupon code"
+                className={styles.input}
+                name="fullName"
+                value={address.fullName}
+                onChange={handleChange}
+                placeholder="John Doe"
               />
-              <button className={styles.couponBtn} type="button">
-                Apply
-              </button>
+              {errors.fullName && <span className={styles.error}>{errors.fullName}</span>}
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Phone *</label>
+              <input
+                className={styles.input}
+                name="phone"
+                value={address.phone}
+                onChange={handleChange}
+                placeholder="9876543210"
+                maxLength={10}
+              />
+              {errors.phone && <span className={styles.error}>{errors.phone}</span>}
+            </div>
+          </div>
+
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Address Line 1 *</label>
+            <input
+              className={styles.input}
+              name="line1"
+              value={address.line1}
+              onChange={handleChange}
+              placeholder="House / Flat / Building"
+            />
+            {errors.line1 && <span className={styles.error}>{errors.line1}</span>}
+          </div>
+
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Address Line 2</label>
+            <input
+              className={styles.input}
+              name="line2"
+              value={address.line2}
+              onChange={handleChange}
+              placeholder="Street, Area, Landmark"
+            />
+          </div>
+
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>City *</label>
+              <input
+                className={styles.input}
+                name="city"
+                value={address.city}
+                onChange={handleChange}
+                placeholder="City"
+              />
+              {errors.city && <span className={styles.error}>{errors.city}</span>}
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>State *</label>
+              <input
+                className={styles.input}
+                name="state"
+                value={address.state}
+                onChange={handleChange}
+                placeholder="State"
+              />
+              {errors.state && <span className={styles.error}>{errors.state}</span>}
+            </div>
+          </div>
+
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Pincode *</label>
+            <input
+              className={styles.input}
+              name="pincode"
+              value={address.pincode}
+              onChange={handleChange}
+              placeholder="560001"
+              maxLength={6}
+            />
+            {errors.pincode && <span className={styles.error}>{errors.pincode}</span>}
+          </div>
+        </div>
+      </div>
+
+      {/* ─── Payment Method ───────────────── */}
+      <div className={styles.card}>
+        <h2 className={styles.cardTitle}>
+          <FiCreditCard size={16} /> Payment Method
+        </h2>
+        <div className={styles.paymentOptions}>
+          <div
+            className={`${styles.paymentOption} ${paymentMethod === 'cod' ? styles.paymentOptionActive : ''}`}
+            onClick={() => setPaymentMethod('cod')}
+          >
+            <div className={`${styles.paymentRadio} ${paymentMethod === 'cod' ? styles.paymentRadioActive : ''}`} />
+            <div>
+              <div className={styles.paymentLabel}>Cash on Delivery</div>
+              <div className={styles.paymentDesc}>Pay when your order arrives</div>
+            </div>
+          </div>
+
+          <div
+            className={`${styles.paymentOption} ${paymentMethod === 'razorpay' ? styles.paymentOptionActive : ''}`}
+            onClick={() => setPaymentMethod('razorpay')}
+          >
+            <div className={`${styles.paymentRadio} ${paymentMethod === 'razorpay' ? styles.paymentRadioActive : ''}`} />
+            <div>
+              <div className={styles.paymentLabel}>Pay Online</div>
+              <div className={styles.paymentDesc}>Credit/Debit Card, UPI, Netbanking</div>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* ─── Right: Order Summary ────────── */}
-        <div className={styles.summaryPanel}>
-          <div className={styles.summaryCard}>
-            <h2 className={styles.cardTitle}>Order Summary</h2>
+      {/* ─── Coupon ───────────────────────── */}
+      <div className={styles.card}>
+        <h2 className={styles.cardTitle}>
+          <FiTag size={16} /> Have a Coupon?
+        </h2>
+        <div className={styles.couponRow}>
+          <input
+            className={styles.couponInput}
+            value={couponCode}
+            onChange={(e) => setCouponCode(e.target.value)}
+            placeholder="Enter coupon code"
+          />
+          <button className={styles.couponBtn} type="button">
+            Apply
+          </button>
+        </div>
+      </div>
 
-            <div className={styles.summaryItems}>
-              {items.map((item) => (
-                <div key={item._id} className={styles.summaryItem}>
-                  <div className={styles.summaryItemImg}>
-                    <img src={item.product.images?.[0]?.url || '/placeholder.png'} alt={item.product.name} />
-                  </div>
-                  <div className={styles.summaryItemInfo}>
-                    <div className={styles.summaryItemName}>{item.product.name}</div>
-                    <div className={styles.summaryItemQty}>Qty: {item.quantity}</div>
-                  </div>
-                  <div className={styles.summaryItemPrice}>
-                    ₹{(item.product.price * item.quantity).toLocaleString('en-IN')}
-                  </div>
-                </div>
-              ))}
-            </div>
+      {/* ─── Order Summary ────────────────── */}
+      <div className={styles.summaryCard}>
+        <h2 className={styles.cardTitle}>Order Summary</h2>
 
-            <hr className={styles.divider} />
-
-            <div className={styles.summaryRow}>
-              <span>Subtotal ({totalItems} items)</span>
-              <span className={styles.summaryValue}>₹{mrpTotal.toLocaleString('en-IN')}</span>
-            </div>
-
-            {savings > 0 && (
-              <div className={styles.summaryRow}>
-                <span>Discount</span>
-                <span className={styles.savingsValue}>−₹{savings.toLocaleString('en-IN')}</span>
+        <div className={styles.summaryItems}>
+          {items.map((item) => (
+            <div key={item._id} className={styles.summaryItem}>
+              <div className={styles.summaryItemImg}>
+                <img src={item.product.images?.[0]?.url || '/favicon.svg'} alt={item.product.name} />
               </div>
-            )}
-
-            <div className={styles.summaryRow}>
-              <span>Shipping</span>
-              <span className={styles.summaryValue}>
-                {shipping === 0 ? (
-                  <span style={{ color: 'var(--color-success)' }}>FREE</span>
-                ) : (
-                  `₹${shipping}`
-                )}
-              </span>
+              <div className={styles.summaryItemInfo}>
+                <div className={styles.summaryItemName}>{item.product.name}</div>
+                <div className={styles.summaryItemQty}>Qty: {item.quantity}</div>
+              </div>
+              <div className={styles.summaryItemPrice}>
+                ₹{(item.product.price * item.quantity).toLocaleString('en-IN')}
+              </div>
             </div>
+          ))}
+        </div>
 
-            <div className={styles.totalRow}>
-              <span className={styles.totalLabel}>Total</span>
-              <span className={styles.totalValue}>₹{total.toLocaleString('en-IN')}</span>
-            </div>
+        <hr className={styles.divider} />
 
-            <button
-              className={styles.placeOrderBtn}
-              onClick={handlePlaceOrder}
-              disabled={isSubmitting}
-            >
-              {isSubmitting
-                ? 'Processing...'
-                : paymentMethod === 'cod'
-                  ? '📦 Place Order (COD)'
-                  : '💳 Pay & Place Order'}
-            </button>
+        <div className={styles.summaryRow}>
+          <span>Subtotal ({totalItems} items)</span>
+          <span className={styles.summaryValue}>₹{mrpTotal.toLocaleString('en-IN')}</span>
+        </div>
 
-            <div className={styles.secureNote}>
-              <FiShield size={14} /> Secure & encrypted checkout
-            </div>
+        {savings > 0 && (
+          <div className={styles.summaryRow}>
+            <span>Discount</span>
+            <span className={styles.savingsValue}>−₹{savings.toLocaleString('en-IN')}</span>
           </div>
+        )}
+
+        <div className={styles.summaryRow}>
+          <span>Shipping</span>
+          {shipping === 0 ? (
+            <span className={styles.freeShipping}>FREE</span>
+          ) : (
+            <span className={styles.summaryValue}>₹{shipping}</span>
+          )}
+        </div>
+
+        <div className={styles.totalRow}>
+          <span className={styles.totalLabel}>Total</span>
+          <span className={styles.totalValue}>₹{total.toLocaleString('en-IN')}</span>
+        </div>
+
+        <button
+          className={styles.placeOrderBtn}
+          onClick={handlePlaceOrder}
+          disabled={isSubmitting}
+        >
+          {isSubmitting
+            ? 'Processing...'
+            : paymentMethod === 'cod'
+              ? 'Place Order'
+              : 'Pay & Place Order'}
+        </button>
+
+        <div className={styles.secureNote}>
+          <FiShield size={13} /> Secure &amp; encrypted checkout
         </div>
       </div>
     </section>

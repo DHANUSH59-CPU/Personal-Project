@@ -1,4 +1,4 @@
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, NavLink } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { FiGrid, FiBox, FiShoppingBag, FiUsers, FiArrowLeft } from 'react-icons/fi';
 import useAuth from '../../hooks/useAuth';
@@ -10,10 +10,10 @@ const AdminLayout = () => {
   if (!isAdmin) return <Navigate to="/" replace />;
 
   const navItems = [
-    { to: '/admin', icon: <FiGrid />, label: 'Dashboard', end: true },
-    { to: '/admin/products', icon: <FiBox />, label: 'Products' },
-    { to: '/admin/orders', icon: <FiShoppingBag />, label: 'Orders' },
-    { to: '/admin/users', icon: <FiUsers />, label: 'Users' },
+    { to: '/admin', icon: <FiGrid size={14} />, label: 'Dashboard', end: true },
+    { to: '/admin/products', icon: <FiBox size={14} />, label: 'Products' },
+    { to: '/admin/orders', icon: <FiShoppingBag size={14} />, label: 'Orders' },
+    { to: '/admin/users', icon: <FiUsers size={14} />, label: 'Users' },
   ];
 
   return (
@@ -21,16 +21,23 @@ const AdminLayout = () => {
       <aside className={styles.sidebar}>
         <div className={styles.sidebarHeader}>
           <Link to="/" className={styles.backLink}>
-            <FiArrowLeft /> Back to Store
+            <FiArrowLeft size={12} /> Back to Store
           </Link>
-          <h2 className={styles.title}>Admin Panel</h2>
+          <h2 className={styles.title}>Admin</h2>
         </div>
         <nav className={styles.nav}>
           {navItems.map((item) => (
-            <Link key={item.to} to={item.to} className={styles.navItem}>
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.end}
+              className={({ isActive }) =>
+                `${styles.navItem} ${isActive ? styles.navItemActive : ''}`
+              }
+            >
               {item.icon}
               <span>{item.label}</span>
-            </Link>
+            </NavLink>
           ))}
         </nav>
       </aside>

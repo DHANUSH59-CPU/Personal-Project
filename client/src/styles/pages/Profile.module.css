@@ -1,131 +1,134 @@
 .profilePage {
-  padding: var(--space-2xl) 0;
-  min-height: 60vh;
-  max-width: 700px;
-  margin: 0 auto;
+  padding: 24px 24px 100px;
+  background: #FDF8F9;
+  min-height: 100vh;
 }
 
-.title {
-  font-family: var(--font-heading);
-  font-size: 1.8rem;
-  font-weight: 800;
-  margin-bottom: var(--space-xl);
+.pageTitle {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  font-weight: 600;
+  color: #1C1014;
+  letter-spacing: -0.02em;
+  margin-bottom: 20px;
 }
 
+/* ─── CARD ───────────────────────────── */
 .card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border-light);
-  border-radius: var(--radius-lg);
-  padding: var(--space-xl);
-  margin-bottom: var(--space-lg);
+  background: #fff;
+  border: 1px solid #EEE5E9;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 14px;
 }
 
 .cardTitle {
-  font-family: var(--font-heading);
-  font-size: 1.05rem;
-  font-weight: 700;
-  margin-bottom: var(--space-lg);
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 700;
+  color: #1C1014;
+  letter-spacing: 0.04em;
+  margin-bottom: 18px;
 }
 
+/* ─── FORM ───────────────────────────── */
 .formGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.formRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--space-md);
+  gap: 12px;
 }
 
 .formGroup {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-}
-
-.fullWidth {
-  grid-column: 1 / -1;
+  gap: 5px;
 }
 
 .label {
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--color-text-secondary);
+  font-size: 10px;
+  font-weight: 700;
+  color: #9A8088;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  letter-spacing: 0.3px;
 }
 
 .input {
   padding: 12px 14px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  font-size: 0.9rem;
-  color: var(--color-text);
-  background: var(--color-bg);
-  transition: border-color var(--transition-fast);
+  border: 1.5px solid #EEE5E9;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  color: #1C1014;
+  background: #FAFAFA;
+  transition: border-color 0.2s;
 }
 
-.input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-}
+.input:focus { border-color: #C4005A; outline: none; background: #fff; }
+.input::placeholder { color: #C0AAAF; }
+.input:disabled { opacity: 0.55; cursor: not-allowed; }
 
-.inputDisabled {
-  background: var(--color-surface-hover);
-  color: var(--color-text-muted);
-  cursor: not-allowed;
-}
-
-.error {
-  font-size: 0.75rem;
-  color: var(--color-error);
-}
-
+/* ─── SAVE BUTTON ─────────────────── */
 .saveBtn {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 12px 28px;
-  margin-top: var(--space-md);
-  background: var(--gradient-primary);
-  color: white;
+  gap: 8px;
+  padding: 12px 22px;
+  background: #C4005A;
+  color: #fff;
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: 4px;
+  font-size: 12px;
   font-weight: 600;
-  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   cursor: pointer;
-  box-shadow: var(--shadow-primary);
-  transition: transform var(--transition-fast);
+  font-family: 'DM Sans', sans-serif;
+  transition: opacity 0.2s;
 }
 
-.saveBtn:hover {
-  transform: translateY(-1px);
+.saveBtn:hover:not(:disabled) { opacity: 0.88; }
+.saveBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ─── AVATAR ROW ─────────────────── */
+.avatarRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
 }
 
-.saveBtn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
+.avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(196,0,90,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: #C4005A;
+  flex-shrink: 0;
 }
 
-.success {
-  font-size: 0.85rem;
-  color: var(--color-success);
-  margin-top: var(--space-sm);
+.avatarName {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1C1014;
 }
 
-.loading {
-  text-align: center;
-  padding: var(--space-3xl);
-  color: var(--color-text-muted);
-}
-
-@media (max-width: 768px) {
-  .profilePage {
-    padding: var(--space-xl) var(--space-md);
-  }
-
-  .formGrid {
-    grid-template-columns: 1fr;
-  }
+.avatarEmail {
+  font-size: 12px;
+  color: #9A8088;
+  margin-top: 2px;
 }

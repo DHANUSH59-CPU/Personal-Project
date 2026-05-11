@@ -1,13 +1,12 @@
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { FiShoppingCart, FiUser, FiMenu, FiX, FiSearch } from 'react-icons/fi';
+import { useDispatch, useSelector } from 'react-redux';
+import { FiShoppingCart, FiUser, FiMenu, FiX } from 'react-icons/fi';
 import useAuth from '../../hooks/useAuth';
 import { useLogoutMutation } from '../../api/authApi';
 import { clearCredentials } from '../../store/slices/authSlice';
-import { useSelector } from 'react-redux';
 import { selectCartTotalItems } from '../../store/slices/cartSlice';
 import { toggleMobileMenu, closeMobileMenu } from '../../store/slices/uiSlice';
-import { useState } from 'react';
 import styles from '../../styles/components/Navbar.module.css';
 
 const Navbar = () => {
@@ -18,71 +17,58 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [logout] = useLogoutMutation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const handleLogout = async () => {
-    try {
-      await logout().unwrap();
-    } catch {
-      // Continue even if API fails
-    }
+    try { await logout().unwrap(); } catch {}
     dispatch(clearCredentials());
+    setDropdownOpen(false);
     navigate('/');
   };
 
   return (
-    <nav className={styles.navbar}>
-      <div className={`container ${styles.navInner}`}>
-        {/* Logo */}
-        <Link to="/" className={styles.logo} onClick={() => dispatch(closeMobileMenu())}>
-          <img src="/logo.jpeg" alt="DS Enterprises" className={styles.logoImg} />
-          <span className={styles.logoText}>DS Enterprises</span>
+    <nav className={`${styles.navbar} ${scrolled ? styles.navbarScrolled : ''}`}>
+      {/* Logo */}
+      <Link to="/" className={styles.logo} onClick={() => dispatch(closeMobileMenu())}>
+        <span className={styles.logoName}>NewFeel</span>
+        <span className={styles.logoSub}>Ultra Thin</span>
+      </Link>
+
+      {/* Actions */}
+      <div className={styles.actions}>
+        <Link to="/cart" className={styles.cartBtn} id="nav-cart">
+          <FiShoppingCart size={20} />
+          {cartTotal > 0 && <span className={styles.badge}>{cartTotal}</span>}
         </Link>
 
-        {/* Desktop Nav */}
-        <ul className={styles.navLinks}>
-          <li><Link to="/">Home</Link></li>
-          <li><Link to="/shop">Shop</Link></li>
-        </ul>
+        {isAuthenticated ? (
+          <div className={styles.userMenu}>
+            <button className={styles.userBtn} onClick={() => setDropdownOpen(!dropdownOpen)} id="nav-user-menu">
+              <FiUser size={16} />
+              <span className={styles.userName}>{user?.name?.split(' ')[0]}</span>
+            </button>
+            {dropdownOpen && (
+              <div className={styles.dropdown}>
+                <Link to="/profile" onClick={() => setDropdownOpen(false)}>Profile</Link>
+                <Link to="/orders" onClick={() => setDropdownOpen(false)}>My Orders</Link>
+                {isAdmin && <Link to="/admin" onClick={() => setDropdownOpen(false)}>Admin Panel</Link>}
+                <button onClick={handleLogout}>Logout</button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <Link to="/login" className={styles.loginBtn} id="nav-login">Login</Link>
+        )}
 
-        {/* Actions */}
-        <div className={styles.actions}>
-          <Link to="/cart" className={styles.cartBtn} id="nav-cart">
-            <FiShoppingCart size={20} />
-            {cartTotal > 0 && <span className={styles.badge}>{cartTotal}</span>}
-          </Link>
-
-          {isAuthenticated ? (
-            <div className={styles.userMenu}>
-              <button
-                className={styles.userBtn}
-                onClick={() => setDropdownOpen(!dropdownOpen)}
-                id="nav-user-menu"
-              >
-                <FiUser size={20} />
-                <span className={styles.userName}>{user?.name?.split(' ')[0]}</span>
-              </button>
-              {dropdownOpen && (
-                <div className={styles.dropdown}>
-                  <Link to="/profile" onClick={() => setDropdownOpen(false)}>Profile</Link>
-                  <Link to="/orders" onClick={() => setDropdownOpen(false)}>My Orders</Link>
-                  {isAdmin && <Link to="/admin" onClick={() => setDropdownOpen(false)}>Admin Panel</Link>}
-                  <button onClick={handleLogout}>Logout</button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <Link to="/login" className={styles.loginBtn} id="nav-login">Login</Link>
-          )}
-
-          {/* Mobile toggle */}
-          <button
-            className={styles.mobileToggle}
-            onClick={() => dispatch(toggleMobileMenu())}
-            id="nav-mobile-toggle"
-          >
-            {mobileMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
-          </button>
-        </div>
+        <button className={styles.mobileToggle} onClick={() => dispatch(toggleMobileMenu())} id="nav-mobile-toggle">
+          {mobileMenuOpen ? <FiX size={22} /> : <FiMenu size={22} />}
+        </button>
       </div>
 
       {/* Mobile Menu */}

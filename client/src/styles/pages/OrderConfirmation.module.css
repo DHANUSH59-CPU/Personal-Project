@@ -1,301 +1,281 @@
-/* ═══════════════════════════════════════════
-   ORDER CONFIRMATION PAGE
-   ═══════════════════════════════════════════ */
-.page {
-  padding: var(--space-2xl) 0;
-  min-height: 60vh;
+.confirmPage {
+  padding: 24px 24px 100px;
+  background: #FDF8F9;
+  min-height: 100vh;
 }
 
-.loading {
-  text-align: center;
-  padding: var(--space-3xl);
-  color: var(--color-text-muted);
-}
-
-.errorState {
-  text-align: center;
-  padding: var(--space-3xl);
-}
-
-/* ─── Success Banner ─────────────────── */
+/* ─── SUCCESS BANNER ────────────────── */
 .successBanner {
+  background: linear-gradient(135deg, #fff 0%, #FFF5F8 100%);
+  border: 1px solid rgba(196,0,90,0.15);
+  border-radius: 20px;
+  padding: 32px 24px;
   text-align: center;
-  padding: var(--space-2xl) var(--space-xl);
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-  border: 1px solid rgba(76, 175, 80, 0.2);
-  border-radius: var(--radius-xl);
-  margin-bottom: var(--space-xl);
+  margin-bottom: 16px;
 }
 
 .successIcon {
-  font-size: 3.5rem;
-  margin-bottom: var(--space-md);
+  font-size: 44px;
+  margin-bottom: 12px;
+  display: block;
 }
 
 .successTitle {
-  font-family: var(--font-heading);
-  font-size: 1.6rem;
-  font-weight: 800;
-  color: var(--color-text);
-  margin-bottom: 4px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 26px;
+  font-weight: 600;
+  color: #1C1014;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
 }
 
-.orderId {
-  font-size: 0.85rem;
-  color: var(--color-text-muted);
+.orderIdRow {
+  font-size: 13px;
+  color: #9A8088;
 }
 
 .orderIdCode {
-  font-weight: 600;
-  color: var(--color-text-secondary);
+  font-weight: 700;
+  color: #C4005A;
+  letter-spacing: 0.06em;
 }
 
-/* ─── Details Grid ───────────────────── */
-.detailsGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-lg);
-  margin-bottom: var(--space-xl);
-}
-
+/* ─── CARD ───────────────────────────── */
 .card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border-light);
-  border-radius: var(--radius-lg);
-  padding: var(--space-xl);
+  background: #fff;
+  border: 1px solid #EEE5E9;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 12px;
 }
 
 .cardTitle {
-  font-family: var(--font-heading);
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--color-text);
-  margin-bottom: var(--space-md);
   display: flex;
   align-items: center;
   gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1C1014;
+  letter-spacing: 0.04em;
+  margin-bottom: 14px;
+  text-transform: uppercase;
 }
 
+/* ─── ADDRESS ────────────────────────── */
 .addressText {
-  font-size: 0.9rem;
-  color: var(--color-text-secondary);
-  line-height: 1.7;
+  font-size: 14px;
+  color: #5A4850;
+  line-height: 1.8;
 }
 
-.addressText strong {
-  color: var(--color-text);
-}
-
-/* ─── Status Badges ──────────────────── */
+/* ─── STATUS ROW ─────────────────────── */
 .statusRow {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: 10px;
 }
 
 .statusItem {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  font-size: 0.9rem;
+  justify-content: space-between;
 }
 
 .statusLabel {
-  color: var(--color-text-secondary);
+  font-size: 13px;
+  color: #9A8088;
 }
 
+/* ─── BADGES ─────────────────────────── */
 .badge {
-  display: inline-flex;
-  padding: 4px 12px;
-  border-radius: 50px;
-  font-size: 0.78rem;
-  font-weight: 600;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
-.badgePending {
-  background: rgba(255, 152, 0, 0.1);
-  color: #e65100;
+  padding: 4px 10px;
+  border-radius: 20px;
 }
 
 .badgePaid {
-  background: rgba(76, 175, 80, 0.1);
-  color: #2e7d32;
+  background: rgba(43,104,64,0.1);
+  color: #2B6840;
+}
+
+.badgePending {
+  background: rgba(196,0,90,0.1);
+  color: #C4005A;
 }
 
 .badgeProcessing {
-  background: rgba(33, 150, 243, 0.1);
-  color: #1565c0;
+  background: rgba(33,150,243,0.1);
+  color: #1976D2;
 }
 
 .badgeConfirmed {
-  background: rgba(76, 175, 80, 0.1);
-  color: #2e7d32;
+  background: rgba(43,104,64,0.1);
+  color: #2B6840;
 }
 
-/* ─── Order Items ────────────────────── */
-.itemsCard {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border-light);
-  border-radius: var(--radius-lg);
-  padding: var(--space-xl);
-  margin-bottom: var(--space-xl);
+.methodText {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1C1014;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
+/* ─── ORDER ITEMS ────────────────────── */
 .itemsList {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
 .orderItem {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
-  padding: var(--space-sm) 0;
-}
-
-.orderItem + .orderItem {
-  border-top: 1px solid var(--color-border-light);
-  padding-top: var(--space-sm);
+  gap: 12px;
 }
 
 .itemImg {
-  width: 56px;
-  height: 56px;
-  border-radius: var(--radius-sm);
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
   overflow: hidden;
+  border: 1px solid #EEE5E9;
+  background: #FDF8F9;
   flex-shrink: 0;
-  border: 1px solid var(--color-border-light);
 }
 
 .itemImg img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
 
-.itemInfo {
-  flex: 1;
-  min-width: 0;
-}
+.itemInfo { flex: 1; min-width: 0; }
 
 .itemName {
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 600;
+  color: #1C1014;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .itemQty {
-  font-size: 0.78rem;
-  color: var(--color-text-muted);
+  font-size: 11px;
+  color: #9A8088;
+  margin-top: 2px;
 }
 
 .itemPrice {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
   font-weight: 600;
-  color: var(--color-text);
-  white-space: nowrap;
+  color: #1C1014;
+  flex-shrink: 0;
 }
 
-/* ─── Price Summary ──────────────────── */
+/* ─── PRICE SUMMARY ──────────────────── */
 .priceSummary {
-  border-top: 1px solid var(--color-border-light);
-  padding-top: var(--space-md);
-  margin-top: var(--space-sm);
+  border-top: 1px solid #EEE5E9;
+  padding-top: 14px;
 }
 
 .priceRow {
   display: flex;
   justify-content: space-between;
-  font-size: 0.9rem;
-  padding: 4px 0;
-  color: var(--color-text-secondary);
+  align-items: center;
+  font-size: 13px;
+  color: #7A5F68;
+  padding: 5px 0;
 }
 
-.priceValue {
-  font-weight: 600;
-  color: var(--color-text);
-}
+.priceValue { font-weight: 600; color: #1C1014; }
+.savingsValue { font-weight: 600; color: #2B6840; }
+.freeShipping { font-weight: 600; color: #2B6840; }
 
 .totalRow {
   display: flex;
   justify-content: space-between;
-  padding: 10px 0 0;
-  margin-top: 4px;
-  border-top: 2px solid var(--color-border);
-  font-size: 1.1rem;
+  align-items: center;
+  padding: 14px 0 4px;
+  border-top: 1px solid #EEE5E9;
+  margin-top: 6px;
 }
 
-.totalLabel {
-  font-family: var(--font-heading);
-  font-weight: 700;
-}
+.totalLabel { font-size: 14px; font-weight: 700; color: #1C1014; }
 
 .totalValue {
-  font-family: var(--font-heading);
-  font-weight: 800;
-  color: var(--color-primary);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: #C4005A;
 }
 
-/* ─── Actions ────────────────────────── */
+/* ─── ACTIONS ────────────────────────── */
 .actions {
   display: flex;
-  gap: var(--space-md);
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
 }
 
 .shopBtn {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 14px 28px;
-  background: var(--gradient-primary);
-  color: white;
-  border-radius: var(--radius-md);
+  padding: 15px;
+  background: #C4005A;
+  color: #fff;
+  border-radius: 4px;
+  font-size: 12px;
   font-weight: 600;
-  box-shadow: var(--shadow-primary);
-  transition: transform var(--transition-fast);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: opacity 0.2s;
+  font-family: 'DM Sans', sans-serif;
 }
 
-.shopBtn:hover {
-  transform: translateY(-2px);
-}
+.shopBtn:hover { opacity: 0.88; }
 
 .ordersBtn {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 14px 28px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  font-weight: 500;
-  color: var(--color-text-secondary);
-  transition: all var(--transition-fast);
+  padding: 14px;
+  background: transparent;
+  color: #5A4850;
+  border: 1.5px solid #EEE5E9;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: border-color 0.2s, color 0.2s;
+  font-family: 'DM Sans', sans-serif;
 }
 
-.ordersBtn:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
+.ordersBtn:hover { border-color: #C4005A; color: #C4005A; }
+
+/* ─── ERROR STATE ────────────────────── */
+.errorState {
+  text-align: center;
+  padding: 80px 0;
+  font-size: 15px;
+  color: #5A4850;
 }
 
-/* ─── Mobile ─────────────────────────── */
-@media (max-width: 768px) {
-  .detailsGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .successTitle {
-    font-size: 1.3rem;
-  }
-
-  .actions {
-    flex-direction: column;
-  }
-
-  .shopBtn,
-  .ordersBtn {
-    justify-content: center;
-    width: 100%;
-  }
+.errorState a {
+  color: #C4005A;
+  font-weight: 600;
+  text-decoration: none;
 }
