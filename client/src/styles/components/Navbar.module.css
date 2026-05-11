@@ -2,10 +2,11 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  padding: 16px 22px;
+  padding: 12px 22px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  background: transparent;
   transition: background 0.4s, box-shadow 0.4s;
 }
 
