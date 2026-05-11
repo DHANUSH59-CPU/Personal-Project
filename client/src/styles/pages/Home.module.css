@@ -31,7 +31,8 @@
   width: 260px; height: 60px; background: rgba(196,0,90,0.1); border-radius: 50%; filter: blur(24px);
 }
 .heroImage {
-  width: 255px; position: relative;
+  width: 255px; min-height: 255px; position: relative;
+  object-fit: contain;
   filter: drop-shadow(0 24px 48px rgba(196,0,90,0.18));
   animation: float 5s ease-in-out infinite;
 }
