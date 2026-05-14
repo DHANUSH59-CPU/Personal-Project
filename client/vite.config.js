@@ -12,4 +12,20 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Vendor: React core (shared across all pages)
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          // Vendor: Redux + RTK Query (shared across data-fetching pages)
+          'vendor-redux': ['@reduxjs/toolkit', 'react-redux'],
+          // Vendor: Other libs
+          'vendor-libs': ['react-hot-toast', 'react-icons'],
+        },
+      },
+    },
+    // Target modern browsers for smaller output
+    target: 'es2020',
+  },
 });

@@ -60,7 +60,6 @@
 
   /* Layout — mobile-first, max 430px */
   --max-width: 430px;
-  --nav-height: 60px;
 }
 
 /* ─── Reset ──────────────────────────────────────────── */
@@ -140,11 +139,6 @@ ul, ol { list-style: none; }
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-}
-
-.container {
-  width: 100%;
-  padding: 0 24px;
 }
 
 .sr-only {

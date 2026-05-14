@@ -1,9 +1,10 @@
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { FiStar } from 'react-icons/fi';
 import { formatPrice, getDiscountPercent } from '../../utils/formatters';
 import styles from '../../styles/components/ProductCard.module.css';
 
-const ProductCard = ({ product }) => {
+const ProductCard = memo(({ product }) => {
   const discount = getDiscountPercent(product.mrp, product.price);
 
   return (
@@ -52,6 +53,8 @@ const ProductCard = ({ product }) => {
       </div>
     </Link>
   );
-};
+});
+
+ProductCard.displayName = 'ProductCard';
 
 export default ProductCard;

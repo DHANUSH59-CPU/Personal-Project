@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styles from '../styles/pages/Home.module.css';
 
@@ -179,7 +179,7 @@ function AdsCarousel() {
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
-        <img key={current} src={ad.src} alt={ad.tag} className={styles.adsImage} />
+        <img key={current} src={ad.src} alt={ad.tag} className={styles.adsImage} loading="lazy" />
         <div className={`label-caps ${styles.adsLimitedBadge}`}>Limited Time</div>
         <div className={styles.adsOverlay}>
           <div className={styles.adsOverlayText}>

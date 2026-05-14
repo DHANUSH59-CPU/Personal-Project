@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import styles from '../../styles/components/Footer.module.css';
 
 const IcoWA = () => (
@@ -7,7 +8,7 @@ const IcoWA = () => (
   </svg>
 );
 
-const Footer = () => (
+const Footer = memo(() => (
   <footer className={styles.footer}>
     <div className={styles.brand}>
       <div className={styles.brandName}>NewFeel</div>
@@ -33,6 +34,8 @@ const Footer = () => (
       Discreet packaging · Free returns · Pan-India delivery
     </div>
   </footer>
-);
+));
+
+Footer.displayName = 'Footer';
 
 export default Footer;
