@@ -4,16 +4,19 @@ import env from '../config/env.js';
 import Order from '../models/Order.js';
 import ApiError from '../utils/ApiError.js';
 
-// Lazy init — only created when a payment is actually triggered
+// Lazy singleton — only created on first payment call, then reused
+let razorpayInstance = null;
 const getRazorpay = () => {
+  if (razorpayInstance) return razorpayInstance;
   if (!env.RAZORPAY_KEY_ID || !env.RAZORPAY_KEY_SECRET ||
       env.RAZORPAY_KEY_ID === 'your_razorpay_key_id') {
     throw new ApiError(503, 'Online payment is not configured. Please use Cash on Delivery.');
   }
-  return new Razorpay({
+  razorpayInstance = new Razorpay({
     key_id: env.RAZORPAY_KEY_ID,
     key_secret: env.RAZORPAY_KEY_SECRET,
   });
+  return razorpayInstance;
 };
 
 /**

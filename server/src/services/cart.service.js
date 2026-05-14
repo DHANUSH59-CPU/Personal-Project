@@ -49,8 +49,7 @@ export const addToCart = async (userId, productId, quantity = 1) => {
 
   await cart.save();
 
-  return Cart.findOne({ user: userId })
-    .populate('items.product', 'name price mrp images stock isActive slug');
+  return cart.populate('items.product', 'name price mrp images stock isActive slug');
 };
 
 /**
@@ -64,6 +63,9 @@ export const updateCartItem = async (userId, itemId, quantity) => {
   if (!item) throw new ApiError(404, 'Item not found in cart');
 
   const product = await Product.findById(item.product);
+  if (!product || !product.isActive) {
+    throw new ApiError(400, 'Product is no longer available');
+  }
   if (quantity > product.stock) {
     throw new ApiError(400, `Only ${product.stock} items available in stock`);
   }
@@ -71,8 +73,7 @@ export const updateCartItem = async (userId, itemId, quantity) => {
   item.quantity = quantity;
   await cart.save();
 
-  return Cart.findOne({ user: userId })
-    .populate('items.product', 'name price mrp images stock isActive slug');
+  return cart.populate('items.product', 'name price mrp images stock isActive slug');
 };
 
 /**
@@ -85,8 +86,7 @@ export const removeCartItem = async (userId, itemId) => {
   cart.items = cart.items.filter((item) => item._id.toString() !== itemId);
   await cart.save();
 
-  return Cart.findOne({ user: userId })
-    .populate('items.product', 'name price mrp images stock isActive slug');
+  return cart.populate('items.product', 'name price mrp images stock isActive slug');
 };
 
 /**

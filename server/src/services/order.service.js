@@ -18,6 +18,7 @@ export const createOrder = async (userId, orderData) => {
   // Validate stock and build order items
   const items = [];
   let itemsTotal = 0;
+  const stockUpdates = [];
 
   for (const cartItem of cart.items) {
     const product = cartItem.product;
@@ -37,24 +38,41 @@ export const createOrder = async (userId, orderData) => {
     });
 
     itemsTotal += product.price * cartItem.quantity;
+
+    // Prepare atomic stock update
+    stockUpdates.push({
+      updateOne: {
+        filter: { _id: product._id, stock: { $gte: cartItem.quantity } },
+        update: { $inc: { stock: -cartItem.quantity } },
+      },
+    });
   }
 
-  // Apply coupon if provided
+  // Apply coupon if provided (atomic to prevent race condition)
   let discount = 0;
   let couponId = null;
 
   if (orderData.couponCode) {
-    const coupon = await Coupon.findOne({
-      code: orderData.couponCode.toUpperCase(),
-      isActive: true,
-      expiresAt: { $gt: new Date() },
-    });
+    // Atomic: find coupon and increment usage in one operation
+    const coupon = await Coupon.findOneAndUpdate(
+      {
+        code: orderData.couponCode.toUpperCase(),
+        isActive: true,
+        expiresAt: { $gt: new Date() },
+        $or: [
+          { usageLimit: { $exists: false } },
+          { usageLimit: 0 },
+          { $expr: { $lt: ['$usedCount', '$usageLimit'] } },
+        ],
+      },
+      { $inc: { usedCount: 1 } },
+      { new: true }
+    );
 
-    if (!coupon) throw new ApiError(400, 'Invalid or expired coupon');
-    if (coupon.usageLimit && coupon.usedCount >= coupon.usageLimit) {
-      throw new ApiError(400, 'Coupon usage limit reached');
-    }
+    if (!coupon) throw new ApiError(400, 'Invalid, expired, or fully used coupon');
     if (itemsTotal < coupon.minOrderAmount) {
+      // Rollback coupon usage
+      await Coupon.findByIdAndUpdate(coupon._id, { $inc: { usedCount: -1 } });
       throw new ApiError(400, `Minimum order amount for this coupon is ₹${coupon.minOrderAmount}`);
     }
 
@@ -65,14 +83,32 @@ export const createOrder = async (userId, orderData) => {
       discount = coupon.value;
     }
 
-    coupon.usedCount += 1;
-    await coupon.save();
     couponId = coupon._id;
   }
 
   // Calculate shipping (free above ₹499)
   const shippingCost = itemsTotal >= 499 ? 0 : 49;
   const totalAmount = itemsTotal - discount + shippingCost;
+
+  // Atomic stock deduction via bulkWrite (prevents overselling)
+  const stockResult = await Product.bulkWrite(stockUpdates);
+  if (stockResult.modifiedCount !== stockUpdates.length) {
+    // Some products went out of stock between check and update — rollback
+    // Restore any stock that was decremented
+    const restoreOps = stockUpdates.map((op) => ({
+      updateOne: {
+        filter: { _id: op.updateOne.filter._id },
+        update: { $inc: { stock: Math.abs(op.updateOne.update.$inc.stock) } },
+      },
+    }));
+    await Product.bulkWrite(restoreOps);
+
+    // Rollback coupon if used
+    if (couponId) {
+      await Coupon.findByIdAndUpdate(couponId, { $inc: { usedCount: -1 } });
+    }
+    throw new ApiError(400, 'Some items went out of stock. Please refresh and try again.');
+  }
 
   const order = await Order.create({
     user: userId,
@@ -86,13 +122,6 @@ export const createOrder = async (userId, orderData) => {
     coupon: couponId,
     notes: orderData.notes,
   });
-
-  // Reduce product stock
-  for (const cartItem of cart.items) {
-    await Product.findByIdAndUpdate(cartItem.product._id, {
-      $inc: { stock: -cartItem.quantity },
-    });
-  }
 
   // Clear cart
   cart.items = [];
@@ -111,7 +140,8 @@ export const getUserOrders = async (userId, page = 1, limit = 10) => {
     Order.find({ user: userId })
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(limit),
+      .limit(limit)
+      .lean(),
     Order.countDocuments({ user: userId }),
   ]);
 
@@ -124,9 +154,9 @@ export const getUserOrders = async (userId, page = 1, limit = 10) => {
  */
 export const getOrderById = async (orderId, userId = null) => {
   const query = { _id: orderId };
-  if (userId) query.user = userId; // Restrict to user's own order
+  if (userId) query.user = userId;
 
-  const order = await Order.findOne(query).populate('user', 'name email');
+  const order = await Order.findOne(query).populate('user', 'name email').lean();
   if (!order) throw new ApiError(404, 'Order not found');
   return order;
 };
@@ -145,12 +175,14 @@ export const updateOrderStatus = async (orderId, status) => {
   }
   if (status === 'cancelled') {
     order.cancelledAt = new Date();
-    // Restore stock
-    for (const item of order.items) {
-      await Product.findByIdAndUpdate(item.product, {
-        $inc: { stock: item.quantity },
-      });
-    }
+    // Restore stock atomically via bulkWrite
+    const restoreOps = order.items.map((item) => ({
+      updateOne: {
+        filter: { _id: item.product },
+        update: { $inc: { stock: item.quantity } },
+      },
+    }));
+    await Product.bulkWrite(restoreOps);
   }
 
   await order.save();
@@ -174,7 +206,8 @@ export const getAllOrders = async (query) => {
       .populate('user', 'name email')
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(limit),
+      .limit(limit)
+      .lean(),
     Order.countDocuments(filter),
   ]);
 
@@ -197,12 +230,14 @@ export const cancelOrder = async (orderId, userId) => {
   order.orderStatus = 'cancelled';
   order.cancelledAt = new Date();
 
-  // Restore stock
-  for (const item of order.items) {
-    await Product.findByIdAndUpdate(item.product, {
-      $inc: { stock: item.quantity },
-    });
-  }
+  // Restore stock atomically via bulkWrite
+  const restoreOps = order.items.map((item) => ({
+    updateOne: {
+      filter: { _id: item.product },
+      update: { $inc: { stock: item.quantity } },
+    },
+  }));
+  await Product.bulkWrite(restoreOps);
 
   await order.save();
   return order;

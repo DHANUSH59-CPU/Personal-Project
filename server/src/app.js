@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -8,12 +9,14 @@ import env from './config/env.js';
 import routes from './routes/index.js';
 import errorHandler from './middlewares/error.middleware.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 
 // ─── Global Middleware ─────────────────────────────────────
+
+// Gzip compression — ~60-80% smaller JSON responses
+app.use(compression());
 
 // CORS — allow website + mobile app origins
 const allowedOrigins = [
@@ -57,6 +60,14 @@ const authLimiter = rateLimit({
 });
 app.use('/api/auth', authLimiter);
 
+// Payment rate limiting (strict — prevent payment abuse)
+const paymentLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { success: false, message: 'Too many payment attempts, please try again later' },
+});
+app.use('/api/orders/pay', paymentLimiter);
+
 // ─── Routes ────────────────────────────────────────────────
 
 app.use('/api', routes);
@@ -65,11 +76,18 @@ app.use('/api', routes);
 
 if (env.NODE_ENV === 'production') {
   const clientDist = path.join(__dirname, '../../client/dist');
-  app.use(express.static(clientDist));
+
+  // Static assets with long-term caching (Vite hashed filenames make this safe)
+  app.use(express.static(clientDist, {
+    maxAge: '1y',
+    immutable: true,
+  }));
 
   // All non-API routes → index.html (SPA routing)
   app.get(/(.*)/, (_req, res) => {
-    res.sendFile(path.join(clientDist, 'index.html'));
+    res.sendFile(path.join(clientDist, 'index.html'), {
+      maxAge: 0, // Don't cache index.html itself
+    });
   });
 } else {
   app.use((_req, res) => {
@@ -82,4 +100,3 @@ if (env.NODE_ENV === 'production') {
 app.use(errorHandler);
 
 export default app;
-

@@ -5,11 +5,25 @@ import Product from '../models/Product.js';
 import ApiError from '../utils/ApiError.js';
 
 export const getProductReviews = asyncHandler(async (req, res) => {
-  const reviews = await Review.find({ product: req.params.productId })
-    .populate('user', 'name avatar')
-    .sort({ createdAt: -1 });
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 20;
+  const skip = (page - 1) * limit;
 
-  res.status(200).json(new ApiResponse(200, reviews));
+  const [reviews, totalDocs] = await Promise.all([
+    Review.find({ product: req.params.productId })
+      .populate('user', 'name avatar')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+    Review.countDocuments({ product: req.params.productId }),
+  ]);
+
+  const totalPages = Math.ceil(totalDocs / limit);
+  res.status(200).json(new ApiResponse(200, {
+    reviews,
+    pagination: { currentPage: page, totalPages, totalDocs },
+  }));
 });
 
 export const createReview = asyncHandler(async (req, res) => {

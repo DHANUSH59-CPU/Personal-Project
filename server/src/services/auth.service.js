@@ -102,9 +102,19 @@ export const refreshAccessToken = async (incomingRefreshToken) => {
 /**
  * Google Authentication.
  */
+// Lazy singleton for Google OAuth client
+let _OAuth2Client = null;
+let _googleClient = null;
+
 export const googleAuth = async (idToken) => {
-  const { OAuth2Client } = await import('google-auth-library');
-  const client = new OAuth2Client(env.GOOGLE_CLIENT_ID);
+  if (!_OAuth2Client) {
+    const mod = await import('google-auth-library');
+    _OAuth2Client = mod.OAuth2Client;
+  }
+  if (!_googleClient) {
+    _googleClient = new _OAuth2Client(env.GOOGLE_CLIENT_ID);
+  }
+  const client = _googleClient;
   
   try {
     const ticket = await client.verifyIdToken({

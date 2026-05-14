@@ -5,12 +5,12 @@ import { createSlug } from '../utils/helpers.js';
 import ApiError from '../utils/ApiError.js';
 
 export const getCategories = asyncHandler(async (_req, res) => {
-  const categories = await Category.find({ isActive: true }).sort({ name: 1 });
+  const categories = await Category.find({ isActive: true }).sort({ name: 1 }).lean();
   res.status(200).json(new ApiResponse(200, categories));
 });
 
 export const getCategory = asyncHandler(async (req, res) => {
-  const category = await Category.findOne({ slug: req.params.slug, isActive: true });
+  const category = await Category.findOne({ slug: req.params.slug, isActive: true }).lean();
   if (!category) throw new ApiError(404, 'Category not found');
   res.status(200).json(new ApiResponse(200, category));
 });

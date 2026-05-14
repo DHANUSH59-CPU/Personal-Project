@@ -86,5 +86,10 @@ const orderSchema = new mongoose.Schema(
   }
 );
 
+// Indexes for common queries
+orderSchema.index({ user: 1, createdAt: -1 }); // User order listing
+orderSchema.index({ razorpayOrderId: 1 });       // Payment verification lookup
+orderSchema.index({ createdAt: -1 });             // Admin order listing
+
 const Order = mongoose.model('Order', orderSchema);
 export default Order;

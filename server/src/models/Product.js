@@ -84,9 +84,10 @@ const productSchema = new mongoose.Schema(
   }
 );
 
-// Compound index for common queries
+// Compound indexes for common queries
 productSchema.index({ price: 1, avgRating: -1 });
 productSchema.index({ category: 1, isActive: 1 });
+productSchema.index({ name: 'text', description: 'text' }); // Full-text search
 
 const Product = mongoose.model('Product', productSchema);
 export default Product;

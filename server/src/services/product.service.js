@@ -18,7 +18,8 @@ export const getProducts = async (query) => {
       .populate('category', 'name slug')
       .sort(sort)
       .skip(skip)
-      .limit(limit),
+      .limit(limit)
+      .lean(),
     Product.countDocuments(filter),
   ]);
 
@@ -32,17 +33,9 @@ export const getProducts = async (query) => {
  */
 export const getProductBySlug = async (slug) => {
   const product = await Product.findOne({ slug, isActive: true })
-    .populate('category', 'name slug');
+    .populate('category', 'name slug')
+    .lean();
 
-  if (!product) throw new ApiError(404, 'Product not found');
-  return product;
-};
-
-/**
- * Get single product by ID.
- */
-export const getProductById = async (id) => {
-  const product = await Product.findById(id).populate('category', 'name slug');
   if (!product) throw new ApiError(404, 'Product not found');
   return product;
 };

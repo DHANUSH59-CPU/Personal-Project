@@ -54,7 +54,7 @@ export const changePassword = async (userId, currentPassword, newPassword) => {
 export const getAllUsers = async (page = 1, limit = 20) => {
   const skip = (page - 1) * limit;
   const [users, total] = await Promise.all([
-    User.find().sort({ createdAt: -1 }).skip(skip).limit(limit),
+    User.find().sort({ createdAt: -1 }).skip(skip).limit(limit).select('-password -refreshToken').lean(),
     User.countDocuments(),
   ]);
   return { users, total };

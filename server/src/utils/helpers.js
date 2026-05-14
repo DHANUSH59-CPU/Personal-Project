@@ -8,6 +8,11 @@ export const createSlug = (text) => {
 };
 
 /**
+ * Escape regex special characters to prevent ReDoS / NoSQL injection.
+ */
+const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/**
  * Build pagination metadata for list responses.
  */
 export const getPagination = (page, limit, totalDocs) => {
@@ -43,9 +48,10 @@ export const buildProductFilter = (query) => {
   }
 
   if (query.search) {
+    const safeSearch = escapeRegex(query.search.trim());
     filter.$or = [
-      { name: { $regex: query.search, $options: 'i' } },
-      { description: { $regex: query.search, $options: 'i' } },
+      { name: { $regex: safeSearch, $options: 'i' } },
+      { description: { $regex: safeSearch, $options: 'i' } },
     ];
   }
 
