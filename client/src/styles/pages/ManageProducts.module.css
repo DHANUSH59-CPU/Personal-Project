@@ -203,10 +203,20 @@
 
 .closeBtn:hover { background: rgba(196,0,90,0.12); }
 
+.modalForm {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .modalBody {
   flex: 1;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding: 20px;
+  min-height: 0;
 }
 
 /* ─── FORM ───────────────────────────── */

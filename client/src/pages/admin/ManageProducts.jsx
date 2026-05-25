@@ -261,7 +261,7 @@ const ManageProducts = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} className={styles.modalForm}>
               <div className={styles.modalBody}>
                 <div className={styles.form}>
                   {/* Name */}
