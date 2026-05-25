@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { FiPlus, FiEdit2, FiTrash2, FiX, FiUploadCloud } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import { useGetProductsQuery, useCreateProductMutation, useUpdateProductMutation, useDeleteProductMutation } from '../../api/productApi';
@@ -21,6 +21,7 @@ const ManageProducts = () => {
   const [form, setForm] = useState(emptyForm);
   const [images, setImages] = useState([]); // { url, publicId }
   const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
 
   const { data: productsData, isLoading } = useGetProductsQuery({ page, limit: 20 });
   const { data: categoriesData } = useGetCategoriesQuery();
@@ -363,13 +364,19 @@ const ManageProducts = () => {
                   {/* Image Upload */}
                   <div className={styles.imageSection}>
                     <label>Product Images * (max 5)</label>
-                    <label className={styles.uploadArea} htmlFor="image-upload">
+                    <button
+                      type="button"
+                      className={styles.uploadArea}
+                      onClick={() => fileInputRef.current?.click()}
+                    >
                       <FiUploadCloud size={28} className={styles.uploadIcon} />
                       <p>Click to upload images (JPEG, PNG, WebP)</p>
-                    </label>
+                    </button>
                     <input
+                      ref={fileInputRef}
                       id="image-upload" type="file" accept="image/jpeg,image/png,image/webp"
-                      multiple style={{ display: 'none' }}
+                      multiple
+                      style={{ position: 'absolute', left: '-9999px', opacity: 0, pointerEvents: 'none' }}
                       onChange={handleImageUpload}
                     />
 
