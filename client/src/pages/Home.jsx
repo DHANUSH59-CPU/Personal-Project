@@ -111,6 +111,7 @@ function Hero() {
 
 // ─── ADS CAROUSEL ─────────────────────────────────────────────────────────────
 const ADS = [
+  { src: '/uploads/combo-6pack.png', tag: 'Buy 6 Packs · ₹480', sub: '6 NewFeel XXL packs + Free Bag' },
   { src: '/uploads/1st.jpeg',  tag: 'Free Tote Handbag',      sub: '40 pads · ₹499 + shipping' },
   { src: '/uploads/2nd.jpeg',  tag: 'Free Cosmetic Pouch',    sub: '40 pads · ₹499 + shipping' },
   { src: '/uploads/3rd.jpeg',  tag: 'Free Designer Handbag',  sub: '40 pads · ₹499 + shipping' },
@@ -424,8 +425,8 @@ function ComparisonSection() {
 
 // ─── PRICING ──────────────────────────────────────────────────────────────────
 const OFFERS = [
-  { id: 'premium', title: 'Premium Pack', price: 499, desc: 'Full-size pad pack', gift: 'Free Gift', giftDesc: 'Bag, Bangles & more', highlight: true, badge: 'Best Seller' },
-  { id: 'combo',   title: '6 Small Packs Combo', price: 480, desc: '6 small pad packets', gift: 'Free Gift', giftDesc: 'Surprise gift included', highlight: false, badge: 'Value Deal' },
+  { id: 'premium', title: 'Premium Pack', price: 499, desc: 'Full-size pad pack', gift: 'Free Gift', giftDesc: 'Bag, Bangles & more', highlight: true, badge: 'Best Seller', image: '/uploads/hero-product.jpeg' },
+  { id: 'combo',   title: '6 Small Packs Combo', price: 480, desc: '6 small pad packets', gift: 'Free Gift', giftDesc: 'Free Bag included', highlight: false, badge: 'Value Deal', image: '/uploads/combo-6pack.png' },
 ];
 
 function PricingSection() {
@@ -458,6 +459,9 @@ function PricingSection() {
             <div className={styles.packRadio} style={{ border: `1.5px solid ${i === selected ? '#C4005A' : '#DDD0D5'}`, background: i === selected ? '#C4005A' : '#fff' }}>
               {i === selected && <div className={styles.packRadioDot} />}
             </div>
+            {offer.image && (
+              <img src={offer.image} alt={offer.title} className={styles.packImage} loading="lazy" />
+            )}
             <div className={styles.packInfo}>
               <div className={styles.packNameRow}>
                 <span className={styles.packName}>{offer.title}</span>
