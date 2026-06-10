@@ -24,7 +24,7 @@ const Cart = () => {
   const subtotal = validItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
   const mrpTotal = validItems.reduce((sum, item) => sum + (item.product.mrp || item.product.price) * item.quantity, 0);
   const savings = mrpTotal - subtotal;
-  const shipping = subtotal >= 499 ? 0 : 49;
+  const shipping = subtotal >= 480 ? 0 : 49;
   const total = subtotal + shipping;
   const totalItems = validItems.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -150,7 +150,7 @@ const Cart = () => {
             {shipping === 0 ? 'FREE' : `₹${shipping}`}
           </span>
         </div>
-        {shipping > 0 && <p className={styles.shippingNote}>Free shipping on orders above ₹499</p>}
+        {shipping > 0 && <p className={styles.shippingNote}>Free shipping on orders of ₹480 or more</p>}
 
         <div className={styles.summaryTotal}>
           <span className={styles.totalLabel}>Total</span>

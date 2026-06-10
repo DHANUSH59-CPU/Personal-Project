@@ -50,7 +50,7 @@ const Checkout = () => {
     0
   );
   const savings = mrpTotal - subtotal;
-  const shipping = subtotal >= 499 ? 0 : 49;
+  const shipping = subtotal >= 480 ? 0 : 49;
   const total = subtotal + shipping;
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
 

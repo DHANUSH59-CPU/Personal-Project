@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 import path from 'path';
@@ -14,6 +15,13 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 
 // ─── Global Middleware ─────────────────────────────────────
+
+// Security headers (CSP disabled — would block inline scripts/styles in the SPA;
+// crossOriginEmbedderPolicy disabled — would block Cloudinary images)
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginEmbedderPolicy: false,
+}));
 
 // Gzip compression — ~60-80% smaller JSON responses
 app.use(compression());
@@ -59,14 +67,6 @@ const authLimiter = rateLimit({
   message: { success: false, message: 'Too many auth attempts, please try again later' },
 });
 app.use('/api/auth', authLimiter);
-
-// Payment rate limiting (strict — prevent payment abuse)
-const paymentLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 10,
-  message: { success: false, message: 'Too many payment attempts, please try again later' },
-});
-app.use('/api/orders/pay', paymentLimiter);
 
 // ─── Routes ────────────────────────────────────────────────
 

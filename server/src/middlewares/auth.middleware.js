@@ -34,6 +34,7 @@ export const authenticate = asyncHandler(async (req, _res, next) => {
 
     next();
   } catch (error) {
+    if (error instanceof ApiError) throw error; // Preserve intentional errors (e.g. user not found)
     if (error.name === 'TokenExpiredError') {
       throw new ApiError(401, 'Token expired — please refresh');
     }

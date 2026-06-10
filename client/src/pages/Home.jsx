@@ -549,7 +549,7 @@ function StickyBar() {
     <div className={styles.stickyBar} style={{ opacity: visible ? 1 : 0, pointerEvents: visible ? 'auto' : 'none' }}>
       <div className={styles.stickyInfo}>
         <div className={styles.stickySubtitle}>NewFeel Ultra Thin</div>
-        <div className={styles.stickyTitle}>From ₹89 · Free Delivery</div>
+        <div className={styles.stickyTitle}>From ₹480 · Free Delivery</div>
       </div>
       <button onClick={() => navigate('/shop')} className={styles.stickyBtn}>Buy Now</button>
     </div>

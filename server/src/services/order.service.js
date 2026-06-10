@@ -86,8 +86,8 @@ export const createOrder = async (userId, orderData) => {
     couponId = coupon._id;
   }
 
-  // Calculate shipping (free above ₹499)
-  const shippingCost = itemsTotal >= 499 ? 0 : 49;
+  // Calculate shipping (free at ₹480 and above — covers both main offers)
+  const shippingCost = itemsTotal >= 480 ? 0 : 49;
   const totalAmount = itemsTotal - discount + shippingCost;
 
   // Atomic stock deduction via bulkWrite (prevents overselling)

@@ -21,10 +21,18 @@ const getRazorpay = () => {
 
 /**
  * Create a Razorpay order for payment.
+ * Only the order's owner can initiate payment, and only for unpaid, active orders.
  */
-export const createRazorpayOrder = async (orderId) => {
-  const order = await Order.findById(orderId);
+export const createRazorpayOrder = async (orderId, userId) => {
+  const order = await Order.findOne({ _id: orderId, user: userId });
   if (!order) throw new ApiError(404, 'Order not found');
+
+  if (order.paymentStatus === 'paid') {
+    throw new ApiError(400, 'This order is already paid');
+  }
+  if (order.orderStatus === 'cancelled') {
+    throw new ApiError(400, 'Cannot pay for a cancelled order');
+  }
 
   const razorpayOrder = await getRazorpay().orders.create({
     amount: Math.round(order.totalAmount * 100), // Razorpay uses paise
@@ -50,6 +58,11 @@ export const createRazorpayOrder = async (orderId) => {
  * Verify Razorpay payment signature and update order.
  */
 export const verifyPayment = async ({ razorpay_order_id, razorpay_payment_id, razorpay_signature }) => {
+  if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+    throw new ApiError(400, 'Missing payment verification details');
+  }
+  getRazorpay(); // Throws a clean 503 if Razorpay keys are not configured
+
   const body = razorpay_order_id + '|' + razorpay_payment_id;
   const expectedSignature = crypto
     .createHmac('sha256', env.RAZORPAY_KEY_SECRET)

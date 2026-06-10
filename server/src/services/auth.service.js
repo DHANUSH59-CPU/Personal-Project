@@ -48,6 +48,11 @@ export const loginUser = async ({ email, password }) => {
     throw new ApiError(401, 'Invalid email or password');
   }
 
+  // Google-only accounts have no password — bcrypt.compare would crash
+  if (!user.password) {
+    throw new ApiError(401, 'This account uses Google sign-in. Please continue with Google.');
+  }
+
   const isMatch = await user.comparePassword(password);
   if (!isMatch) {
     throw new ApiError(401, 'Invalid email or password');
