@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { GoogleLogin } from '@react-oauth/google';
@@ -13,6 +13,20 @@ const Register = () => {
   const [googleLogin] = useGoogleLoginMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  // GIS button needs a numeric pixel width (max 400) — "100%" is invalid
+  const googleWrapRef = useRef(null);
+  const [googleWidth, setGoogleWidth] = useState(340);
+  useEffect(() => {
+    const update = () => {
+      if (googleWrapRef.current) {
+        setGoogleWidth(Math.min(400, Math.floor(googleWrapRef.current.offsetWidth)));
+      }
+    };
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -115,7 +129,7 @@ const Register = () => {
         </div>
 
         {/* Google */}
-        <div className={styles.googleWrap}>
+        <div className={styles.googleWrap} ref={googleWrapRef}>
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
             onError={() => toast.error('Google Sign-In was unsuccessful')}
@@ -123,7 +137,7 @@ const Register = () => {
             theme="outline"
             size="large"
             text="signup_with"
-            width="100%"
+            width={googleWidth}
           />
         </div>
 
