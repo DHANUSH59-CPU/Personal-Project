@@ -29,10 +29,10 @@ export const login = asyncHandler(async (req, res) => {
 });
 
 export const googleAuth = asyncHandler(async (req, res) => {
-  const { idToken } = req.body;
-  if (!idToken) throw new ApiError(400, 'Google ID token is required');
+  const { accessToken: googleAccessToken } = req.body;
+  if (!googleAccessToken) throw new ApiError(400, 'Google access token is required');
 
-  const { user, accessToken, refreshToken } = await authService.googleAuth(idToken);
+  const { user, accessToken, refreshToken } = await authService.googleAuth(googleAccessToken);
 
   res
     .status(200)

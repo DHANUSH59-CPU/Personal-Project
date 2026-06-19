@@ -99,6 +99,27 @@
   margin-bottom: 20px;
 }
 
+.googleBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid #EEE5E9;
+  border-radius: 8px;
+  background: #fff;
+  color: #1C1014;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.googleBtn:hover { background: #FAFAFA; border-color: #DDD0D5; }
+.googleBtn:active { background: #F4ECEF; }
+
 .authSwitch {
   text-align: center;
   font-size: 13px;

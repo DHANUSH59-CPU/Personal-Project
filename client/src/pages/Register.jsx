@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { GoogleLogin } from '@react-oauth/google';
+import { useGoogleLogin } from '@react-oauth/google';
+import { FcGoogle } from 'react-icons/fc';
 import { useRegisterMutation, useGoogleLoginMutation } from '../api/authApi';
 import { setCredentials } from '../store/slices/authSlice';
 import toast from 'react-hot-toast';
@@ -13,20 +14,6 @@ const Register = () => {
   const [googleLogin] = useGoogleLoginMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  // GIS button needs a numeric pixel width (max 400) — "100%" is invalid
-  const googleWrapRef = useRef(null);
-  const [googleWidth, setGoogleWidth] = useState(340);
-  useEffect(() => {
-    const update = () => {
-      if (googleWrapRef.current) {
-        setGoogleWidth(Math.min(400, Math.floor(googleWrapRef.current.offsetWidth)));
-      }
-    };
-    update();
-    window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
-  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,16 +27,20 @@ const Register = () => {
     }
   };
 
-  const handleGoogleSuccess = async (credentialResponse) => {
-    try {
-      const res = await googleLogin({ idToken: credentialResponse.credential }).unwrap();
-      dispatch(setCredentials({ user: res.data.user, accessToken: res.data.accessToken }));
-      toast.success('Account created successfully!');
-      navigate('/');
-    } catch (err) {
-      toast.error(err?.data?.message || 'Google registration failed');
-    }
-  };
+  // OAuth token flow — works without third-party cookies (unlike the GIS button)
+  const triggerGoogleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        const res = await googleLogin({ accessToken: tokenResponse.access_token }).unwrap();
+        dispatch(setCredentials({ user: res.data.user, accessToken: res.data.accessToken }));
+        toast.success('Account created successfully!');
+        navigate('/');
+      } catch (err) {
+        toast.error(err?.data?.message || 'Google registration failed');
+      }
+    },
+    onError: () => toast.error('Google Sign-In was unsuccessful'),
+  });
 
   return (
     <section className={styles.authPage}>
@@ -129,16 +120,11 @@ const Register = () => {
         </div>
 
         {/* Google */}
-        <div className={styles.googleWrap} ref={googleWrapRef}>
-          <GoogleLogin
-            onSuccess={handleGoogleSuccess}
-            onError={() => toast.error('Google Sign-In was unsuccessful')}
-            shape="rectangular"
-            theme="outline"
-            size="large"
-            text="signup_with"
-            width={googleWidth}
-          />
+        <div className={styles.googleWrap}>
+          <button type="button" className={styles.googleBtn} onClick={() => triggerGoogleLogin()}>
+            <FcGoogle size={20} />
+            Sign up with Google
+          </button>
         </div>
 
         <p className={styles.authSwitch}>

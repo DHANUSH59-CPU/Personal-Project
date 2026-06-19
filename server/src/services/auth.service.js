@@ -106,57 +106,46 @@ export const refreshAccessToken = async (incomingRefreshToken) => {
 
 /**
  * Google Authentication.
+ * Takes a Google OAuth access token (from the @react-oauth/google token flow),
+ * verifies it by fetching the user's profile from Google, then logs in/registers.
+ * The token flow works without third-party cookies (unlike the GIS button).
  */
-// Lazy singleton for Google OAuth client
-let _OAuth2Client = null;
-let _googleClient = null;
+export const googleAuth = async (googleAccessToken) => {
+  if (!googleAccessToken) throw new ApiError(400, 'Google access token is required');
 
-export const googleAuth = async (idToken) => {
-  if (!_OAuth2Client) {
-    const mod = await import('google-auth-library');
-    _OAuth2Client = mod.OAuth2Client;
-  }
-  if (!_googleClient) {
-    _googleClient = new _OAuth2Client(env.GOOGLE_CLIENT_ID);
-  }
-  const client = _googleClient;
-  
+  let payload;
   try {
-    const ticket = await client.verifyIdToken({
-      idToken,
-      audience: env.GOOGLE_CLIENT_ID,
+    const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${googleAccessToken}` },
     });
-    const payload = ticket.getPayload();
-    const { email, name, sub: googleId } = payload;
-
-    let user = await User.findOne({ email });
-
-    if (!user) {
-      // Create a new user if not exists
-      user = await User.create({
-        name,
-        email,
-        googleId,
-        // Using a random placeholder password since it's now optional/handled by pre-save
-        // but we made it optional in the schema so it's fine
-      });
-    } else if (!user.googleId) {
-      // Link Google account to existing email user
-      user.googleId = googleId;
-      await user.save({ validateBeforeSave: false });
-    }
-
-    const { accessToken, refreshToken } = generateTokens(user._id);
-    user.refreshToken = refreshToken;
-    await user.save({ validateBeforeSave: false });
-
-    const userObj = user.toObject();
-    delete userObj.password;
-    delete userObj.refreshToken;
-
-    return { user: userObj, accessToken, refreshToken };
+    if (!res.ok) throw new Error(`userinfo ${res.status}`);
+    payload = await res.json();
   } catch (error) {
-    console.error('Google Auth Error:', error);
+    console.error('Google Auth Error:', error.message);
     throw new ApiError(401, 'Google sign-in failed');
   }
+
+  const { email, name, sub: googleId } = payload;
+  if (!email) throw new ApiError(401, 'Google account has no email');
+
+  let user = await User.findOne({ email });
+
+  if (!user) {
+    // Create a new user (password is optional in the schema for Google accounts)
+    user = await User.create({ name: name || email.split('@')[0], email, googleId });
+  } else if (!user.googleId) {
+    // Link Google account to existing email user
+    user.googleId = googleId;
+    await user.save({ validateBeforeSave: false });
+  }
+
+  const { accessToken, refreshToken } = generateTokens(user._id);
+  user.refreshToken = refreshToken;
+  await user.save({ validateBeforeSave: false });
+
+  const userObj = user.toObject();
+  delete userObj.password;
+  delete userObj.refreshToken;
+
+  return { user: userObj, accessToken, refreshToken };
 };
