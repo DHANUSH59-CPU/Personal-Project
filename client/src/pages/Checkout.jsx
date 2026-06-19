@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiMapPin, FiCreditCard, FiShield, FiTag, FiArrowLeft, FiShoppingBag } from 'react-icons/fi';
+import { FiMapPin, FiCreditCard, FiShield, FiTag, FiArrowLeft, FiShoppingBag, FiNavigation, FiLoader } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import { useGetCartQuery } from '../api/cartApi';
 import { useCreateOrderMutation, useInitiatePaymentMutation, useVerifyPaymentMutation } from '../api/orderApi';
@@ -39,6 +39,7 @@ const Checkout = () => {
   const [couponCode, setCouponCode] = useState('');
   const [errors, setErrors] = useState({});
   const [processing, setProcessing] = useState(false);
+  const [locating, setLocating] = useState(false);
 
   const cart = cartData?.data;
   const items = (cart?.items || []).filter((item) => item.product?.isActive);
@@ -74,6 +75,59 @@ const Checkout = () => {
     const { name, value } = e.target;
     setAddress((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: '' }));
+  };
+
+  // ── Autofill address from device location ──
+  const handleUseLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error('Location is not supported on this device');
+      return;
+    }
+
+    setLocating(true);
+    const toastId = toast.loading('Detecting your location...');
+
+    navigator.geolocation.getCurrentPosition(
+      async ({ coords }) => {
+        try {
+          const { latitude, longitude } = coords;
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}&addressdetails=1`,
+            { headers: { 'Accept-Language': 'en' } }
+          );
+          if (!res.ok) throw new Error('lookup failed');
+          const data = await res.json();
+          const a = data.address || {};
+
+          const line1Parts = [a.house_number, a.road || a.pedestrian || a.residential].filter(Boolean);
+          const line2Parts = [a.neighbourhood, a.suburb, a.village].filter(Boolean);
+
+          setAddress((prev) => ({
+            ...prev,
+            line1: line1Parts.join(', ') || prev.line1,
+            line2: [...new Set(line2Parts)].join(', ') || prev.line2,
+            city: a.city || a.town || a.municipality || a.county || prev.city,
+            state: a.state || prev.state,
+            pincode: a.postcode?.replace(/\s/g, '') || prev.pincode,
+          }));
+          setErrors({});
+          toast.success('Address filled — please verify the details', { id: toastId });
+        } catch {
+          toast.error('Could not fetch address. Please enter manually.', { id: toastId });
+        } finally {
+          setLocating(false);
+        }
+      },
+      (err) => {
+        setLocating(false);
+        const msg =
+          err.code === err.PERMISSION_DENIED
+            ? 'Location permission denied. Please allow access or enter manually.'
+            : 'Could not get your location. Please enter manually.';
+        toast.error(msg, { id: toastId });
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
   };
 
   // ── Handle Razorpay payment ───────────────
@@ -198,9 +252,24 @@ const Checkout = () => {
 
       {/* ─── Shipping Address ─────────────── */}
       <div className={styles.card}>
-        <h2 className={styles.cardTitle}>
-          <FiMapPin size={16} /> Shipping Address
-        </h2>
+        <div className={styles.addressHeader}>
+          <h2 className={styles.cardTitle} style={{ marginBottom: 0 }}>
+            <FiMapPin size={16} /> Shipping Address
+          </h2>
+          <button
+            type="button"
+            className={styles.locationBtn}
+            onClick={handleUseLocation}
+            disabled={locating}
+          >
+            {locating ? (
+              <FiLoader size={14} className={styles.spin} />
+            ) : (
+              <FiNavigation size={14} />
+            )}
+            {locating ? 'Detecting...' : 'Use my location'}
+          </button>
+        </div>
         <div className={styles.formGrid}>
           <div className={styles.formRow}>
             <div className={styles.formGroup}>
