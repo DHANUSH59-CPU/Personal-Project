@@ -21,6 +21,7 @@ const app = express();
 app.use(helmet({
   contentSecurityPolicy: false,
   crossOriginEmbedderPolicy: false,
+  crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' }, // allow OAuth popups to postMessage back
 }));
 
 // Gzip compression — ~60-80% smaller JSON responses
