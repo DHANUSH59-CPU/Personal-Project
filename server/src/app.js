@@ -27,8 +27,20 @@ app.use(helmet({
 app.use(compression());
 
 // CORS — allow website + mobile app origins
+// Derive both www and non-www variants of CLIENT_URL so visitors on either work
+const clientVariants = (() => {
+  if (!env.CLIENT_URL) return [];
+  try {
+    const u = new URL(env.CLIENT_URL);
+    const host = u.host.replace(/^www\./, '');
+    return [`${u.protocol}//${host}`, `${u.protocol}//www.${host}`];
+  } catch {
+    return [env.CLIENT_URL];
+  }
+})();
+
 const allowedOrigins = [
-  env.CLIENT_URL,
+  ...clientVariants,
   'http://localhost',       // Capacitor Android
   'https://localhost',      // Capacitor Android (https)
   'capacitor://localhost',  // Capacitor fallback

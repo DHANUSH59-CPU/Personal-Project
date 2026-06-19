@@ -27,9 +27,11 @@
 ## Repo & Deployment
 
 - **GitHub**: `https://github.com/DHANUSH59-CPU/Personal-Project.git` (branch: `main`)
-- **EC2 Host**: `ubuntu@ip-172-31-37-115` (private IP)
+- **Live URL**: `https://dsenterprises4u.com` (also `www.`) — SSL via Let's Encrypt/Certbot (Nginx plugin, auto-renew)
+- **EC2 Host**: `ubuntu@ip-172-31-37-115` · Public IP `65.0.98.96`
 - **EC2 Path**: `~/Personal-Project`
 - **Process Manager**: PM2 (runs `server/src/server.js`)
+- **Reverse proxy**: Nginx (serves built client, proxies `/api` to :5000, terminates SSL on 443)
 - **EC2 deploy commands**:
   ```bash
   cd ~/Personal-Project
